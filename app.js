@@ -212,30 +212,22 @@ function renderIntroTab() {
         <p>學 ML 有一個幾乎所有人都遇過的困境：<strong style="color:var(--text)">聽理論很順，一進入實操就卡關。</strong>影片裡的圖解清楚生動，但真的要動手，不是要先學 Python，就是要面對像 Weka 這樣功能堆滿卻毫無引導的工具——難度一口氣跳了好幾級。</p>
         <p>DataDojo 就是專門填補這個斷層的地方。<strong style="color:var(--cyan)">看完理論，立刻在這裡動手操作</strong>——不需要寫程式，介面友善，每一步都有即時的視覺回饋，讓你親眼看到資料的變化，而不是對著一堆數字猜發生了什麼事。</p>
 
-        <h3>🎯 設計哲學</h3>
-        <p>每一個功能的存在，都是為了讓你發出那聲「<strong style="color:var(--cyan)">喔～原來是這樣</strong>」。不是把功能攤在介面上，而是讓操作本身產生理解——正規化套下去，你立刻看到分布形狀不變、X 軸縮進 0～1；k 值拉一拉，你親眼看到決策邊界在變形。</p>
+        <h3>📋 操作流程</h3>
+        <ul class="intro-list">
+          <li><strong>📊 資料描述</strong>　載入資料集，查看各欄位的分布、平均值、標準差，建立對資料的基本認識</li>
+          <li><strong>🧹 前處理</strong>　套用正規化，觀察數值縮放前後的分布變化，理解為何需要前處理</li>
+          <li><strong>🤖 訓練 / 測試</strong>　選擇特徵與演算法，調整參數，即時觀察決策邊界的變化</li>
+          <li><strong>💡 結果解讀</strong>　查看準確率與預測分布，理解模型在測試資料上的表現</li>
+        </ul>
 
-        <h3>📊 學習流程</h3>
-        <div class="intro-pipeline">
-          <div class="pipe-stage"><span class="pipe-icon">📊</span><span class="pipe-name">資料描述</span><span class="pipe-desc">看懂資料長什麼樣子</span></div>
-          <div class="pipe-arrow">→</div>
-          <div class="pipe-stage"><span class="pipe-icon">🧹</span><span class="pipe-name">前處理</span><span class="pipe-desc">清理與正規化</span></div>
-          <div class="pipe-arrow">→</div>
-          <div class="pipe-stage"><span class="pipe-icon">🤖</span><span class="pipe-name">訓練 / 測試</span><span class="pipe-desc">選算法、調參數</span></div>
-          <div class="pipe-arrow">→</div>
-          <div class="pipe-stage"><span class="pipe-icon">💡</span><span class="pipe-name">結果解讀</span><span class="pipe-desc">看懂模型學到什麼</span></div>
-        </div>
-
-        <h3>🤝 適合哪些人</h3>
+        <h3>🗺️ 學習地圖</h3>
         <div class="intro-audience">
-          <div class="audience-row"><span class="aud-who">國高中生</span><span class="aud-sep">→</span><span class="aud-what">資料描述就是終點：平均數、標準差、分布圖</span></div>
-          <div class="audience-row"><span class="aud-who">技職 / 高中</span><span class="aud-sep">→</span><span class="aud-what">資料清理與前處理，理解資料品質的重要性</span></div>
-          <div class="audience-row"><span class="aud-who">大學生</span><span class="aud-sep">→</span><span class="aud-what">走完整個 pipeline，從資料到模型評估</span></div>
+          <div class="audience-row"><span class="aud-who">國中小</span><span class="aud-sep">→</span><span class="aud-what">認識資料：平均數、標準差、分布圖，資料描述就是終點</span></div>
+          <div class="audience-row"><span class="aud-who">高中 / 技職</span><span class="aud-sep">→</span><span class="aud-what">資料清理與前處理，親眼看到資料品質如何影響結果</span></div>
+          <div class="audience-row"><span class="aud-who">大學生</span><span class="aud-sep">→</span><span class="aud-what">走完整個 pipeline，從資料載入到模型評估一條龍</span></div>
+          <div class="audience-row aud-next"><span class="aud-who">專業人士</span><span class="aud-sep">→</span><span class="aud-what">帶著在 DataDojo 建立的直覺，銜接 Kaggle 或 Python 生態系實戰</span></div>
         </div>
-        <p style="color:var(--muted);font-size:12px;margin-top:8px">同一個平台，不同的出口——介面設計自然引導你走多深，不強迫選擇。</p>
-
-        <h3>🔗 與 Kaggle 的銜接</h3>
-        <p>DataDojo 和 Kaggle 共享同一個教學基因：理解優先，不只是跑出結果。差別在語言——DataDojo 用視覺語言，Kaggle 用程式語言。在 DataDojo 裡建立直覺之後，帶著這份理解去 Kaggle 動手實作，不再是瞎點。</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px">同一個平台，不同的出口。介面設計自然引導你走多深，不強迫選擇。</p>
 
         <div class="intro-footer">
           <span>🏯 DataDojo</span>

@@ -351,6 +351,29 @@ body {
 .aud-sep { color: var(--border); }
 .aud-what { color: var(--muted); }
 
+.intro-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 16px;
+}
+
+.intro-list li {
+  padding: 8px 12px;
+  background: var(--surface);
+  border-left: 3px solid var(--cyan);
+  border-radius: 0 6px 6px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.intro-list li strong { color: var(--text); }
+
+.aud-next { border-left: 2px solid var(--green); border-radius: 0 6px 6px 0; padding-left: 8px; }
+.aud-next .aud-who { color: var(--green); }
+
 .intro-footer {
   margin-top: 24px;
   padding-top: 16px;
