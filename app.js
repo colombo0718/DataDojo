@@ -41,7 +41,7 @@ const state = {
   rawData: [],
   data: [],
   normalized: false,
-  activeTab: 'describe',
+  activeTab: 'intro',
   selectedCol: 0,
   xFeat: 2,
   yFeat: 3,
@@ -451,9 +451,9 @@ function updateStats() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
+  switchTab('intro');
   await loadDataset('iris');
   updateTable();
-  switchTab('intro');
 
   document.getElementById('dataset-select').addEventListener('change', async e => {
     await loadDataset(e.target.value);
