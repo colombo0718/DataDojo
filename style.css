@@ -270,6 +270,98 @@ body {
 .chart-label.after   { color: var(--green); }
 .chart-sub           { flex: 1; min-height: 0; }
 
+/* ── INTRO COMPONENTS ────────────────────────────────── */
+.intro-gap-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 14px 0 8px;
+}
+
+.gap-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.gap-label { color: var(--text); font-weight: 600; font-size: 13px; }
+.gap-desc  { color: var(--muted); font-size: 11px; }
+
+.gap-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.gap-wall { font-size: 22px; color: var(--orange); font-weight: 700; }
+.gap-hint { color: var(--orange); font-size: 10px; white-space: nowrap; }
+
+.intro-pipeline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0 14px;
+  flex-wrap: wrap;
+}
+
+.pipe-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.pipe-icon { font-size: 20px; }
+.pipe-name { color: var(--cyan); font-size: 12px; font-weight: 600; }
+.pipe-desc { color: var(--muted); font-size: 10px; text-align: center; }
+.pipe-arrow { color: var(--border); font-size: 18px; flex-shrink: 0; }
+
+.intro-audience {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.audience-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.aud-who { color: var(--cyan); font-weight: 600; min-width: 70px; white-space: nowrap; }
+.aud-sep { color: var(--border); }
+.aud-what { color: var(--muted); }
+
+.intro-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 /* ── LOG TAB ──────────────────────────────────────────── */
 #log-tab {
   flex: 1;

@@ -205,14 +205,57 @@ function renderIntroTab() {
     <div id="intro-tab">
       <img src="banner.png" alt="DataDojo 資料道場">
       <div class="intro-body">
+
         <h2>DataDojo 資料道場</h2>
-        <p>LeafLune 旗下的互動式機器學習教學平台。在瀏覽器中體驗完整的資料分析與機器學習流程，不需要寫程式碼。</p>
-        <h3>🎯 學習流程</h3>
-        <p>📊 資料描述 → 🧹 前處理 → 🤖 訓練 / 測試 → 💡 結果解讀</p>
-        <h3>✨ 平台特色</h3>
-        <p>每一個操作都有即時的視覺回饋，讓你親眼看到資料的變化——正規化前後的分布對比、k 值改變時決策邊界即時變形。理解不靠死記，靠的是直接感受。</p>
-        <h3>🤝 適合對象</h3>
-        <p>技職學校學生、資料科學初學者、想直觀理解機器學習的任何人。</p>
+        <p>LeafLune 旗下的互動式機器學習教學平台，讓你在瀏覽器中體驗完整的資料分析與機器學習流程——不需要安裝軟體，不需要寫程式碼。</p>
+
+        <div class="intro-gap-box">
+          <div class="gap-item">
+            <span class="gap-label">理論影片 / 教材</span>
+            <span class="gap-desc">生動的圖解，直觀易懂</span>
+          </div>
+          <div class="gap-arrow">
+            <span class="gap-wall">？</span>
+            <span class="gap-hint">難以跨越的斷層</span>
+          </div>
+          <div class="gap-item">
+            <span class="gap-label">Python / Weka</span>
+            <span class="gap-desc">程式碼或冰冷介面，認知負擔高</span>
+          </div>
+        </div>
+        <p style="text-align:center;color:var(--cyan);font-weight:600;margin-bottom:16px">DataDojo 填補這個斷層</p>
+
+        <h3>🎯 設計哲學</h3>
+        <p>每一個功能的存在，都是為了讓你發出那聲「<strong style="color:var(--cyan)">喔～原來是這樣</strong>」。不是把功能攤在介面上，而是讓操作本身產生理解——正規化套下去，你立刻看到分布形狀不變、X 軸縮進 0～1；k 值拉一拉，你親眼看到決策邊界在變形。</p>
+
+        <h3>📊 學習流程</h3>
+        <div class="intro-pipeline">
+          <div class="pipe-stage"><span class="pipe-icon">📊</span><span class="pipe-name">資料描述</span><span class="pipe-desc">看懂資料長什麼樣子</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage"><span class="pipe-icon">🧹</span><span class="pipe-name">前處理</span><span class="pipe-desc">清理與正規化</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage"><span class="pipe-icon">🤖</span><span class="pipe-name">訓練 / 測試</span><span class="pipe-desc">選算法、調參數</span></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage"><span class="pipe-icon">💡</span><span class="pipe-name">結果解讀</span><span class="pipe-desc">看懂模型學到什麼</span></div>
+        </div>
+
+        <h3>🤝 適合哪些人</h3>
+        <div class="intro-audience">
+          <div class="audience-row"><span class="aud-who">國高中生</span><span class="aud-sep">→</span><span class="aud-what">資料描述就是終點：平均數、標準差、分布圖</span></div>
+          <div class="audience-row"><span class="aud-who">技職 / 高中</span><span class="aud-sep">→</span><span class="aud-what">資料清理與前處理，理解資料品質的重要性</span></div>
+          <div class="audience-row"><span class="aud-who">大學生</span><span class="aud-sep">→</span><span class="aud-what">走完整個 pipeline，從資料到模型評估</span></div>
+        </div>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px">同一個平台，不同的出口——介面設計自然引導你走多深，不強迫選擇。</p>
+
+        <h3>🔗 與 Kaggle 的銜接</h3>
+        <p>DataDojo 和 Kaggle 共享同一個教學基因：理解優先，不只是跑出結果。差別在語言——DataDojo 用視覺語言，Kaggle 用程式語言。在 DataDojo 裡建立直覺之後，帶著這份理解去 Kaggle 動手實作，不再是瞎點。</p>
+
+        <div class="intro-footer">
+          <span>🏯 DataDojo</span>
+          <span style="color:var(--border)">×</span>
+          <span>LeafLune Edutainment Studio</span>
+        </div>
+
       </div>
     </div>`;
 }
