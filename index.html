@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataDojo 資料道場</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='75'>⚔️</text></svg>">
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- HEADER: Banner + Pipeline Map -->
+  <div id="header">
+    <img id="banner-img" src="banner.png" alt="DataDojo 資料道場">
+    <nav id="pipeline-map">
+      <button class="stage-btn active" data-stage="0">📊 資料描述</button>
+      <span class="arrow">›</span>
+      <button class="stage-btn" data-stage="1">🧹 前處理</button>
+      <span class="arrow">›</span>
+      <button class="stage-btn" data-stage="2">🤖 訓練 / 測試</button>
+      <span class="arrow">›</span>
+      <button class="stage-btn" data-stage="3">💡 結果解讀</button>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- LEFT: Data Panel -->
+    <div id="leftPanel">
+      <div id="dataset-bar">
+        <select id="dataset-select">
+          <option value="iris">🌸 Iris 鳶尾花</option>
+        </select>
+        <span id="data-count"></span>
+      </div>
+
+      <div id="table-wrap">
+        <table id="data-table">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="col-panel">
+        <select id="col-select"></select>
+        <div id="stats-row"></div>
+        <div id="col-hist"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Tools Panel -->
+    <div id="rightPanel">
+      <div id="stage-panel"></div>
+      <div id="chart-area"></div>
+      <div id="op-log">
+        <div class="log-header">⌛ 操作記錄</div>
+        <div id="log-body"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
