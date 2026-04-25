@@ -10,24 +10,9 @@
 </head>
 <body>
 
-  <!-- HEADER: Banner + Pipeline Map -->
-  <div id="header">
-    <img id="banner-img" src="banner.png" alt="DataDojo 資料道場">
-    <nav id="pipeline-map">
-      <button class="stage-btn active" data-stage="0">📊 資料描述</button>
-      <span class="arrow">›</span>
-      <button class="stage-btn" data-stage="1">🧹 前處理</button>
-      <span class="arrow">›</span>
-      <button class="stage-btn" data-stage="2">🤖 訓練 / 測試</button>
-      <span class="arrow">›</span>
-      <button class="stage-btn" data-stage="3">💡 結果解讀</button>
-    </nav>
-  </div>
-
-  <!-- MAIN -->
   <div id="main">
 
-    <!-- LEFT: Data Panel -->
+    <!-- LEFT: 資料區 -->
     <div id="leftPanel">
       <div id="dataset-bar">
         <select id="dataset-select">
@@ -35,31 +20,33 @@
         </select>
         <span id="data-count"></span>
       </div>
-
       <div id="table-wrap">
         <table id="data-table">
           <thead></thead>
           <tbody></tbody>
         </table>
       </div>
-
-      <div id="col-panel">
-        <select id="col-select"></select>
-        <div id="stats-row"></div>
-        <div id="col-hist"></div>
-      </div>
     </div>
 
-    <!-- RIGHT: Tools Panel -->
+    <!-- RIGHT: 工具區 -->
     <div id="rightPanel">
-      <div id="stage-panel"></div>
-      <div id="chart-area"></div>
-      <div id="op-log">
-        <div class="log-header">⌛ 操作記錄</div>
-        <div id="log-body"></div>
-      </div>
-    </div>
 
+      <!-- Tab 列 -->
+      <div id="tab-bar">
+        <button class="tab-btn" data-tab="intro">🏯 平台介紹</button>
+        <div class="tab-sep"></div>
+        <button class="tab-btn active" data-tab="describe">📊 資料描述</button>
+        <button class="tab-btn" data-tab="preprocess">🧹 前處理</button>
+        <button class="tab-btn" data-tab="train">🤖 訓練 / 測試</button>
+        <button class="tab-btn" data-tab="results">💡 結果解讀</button>
+        <div class="tab-sep"></div>
+        <button class="tab-btn" data-tab="log">📋 操作記錄</button>
+      </div>
+
+      <!-- Tab 內容 -->
+      <div id="tab-content"></div>
+
+    </div>
   </div>
 
   <script src="app.js"></script>
