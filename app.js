@@ -35,6 +35,8 @@ const DATASET_META = {
   },
 };
 
+const CLASS_COLORS = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A','#19D3F3','#FF6692'];
+
 // ── State ─────────────────────────────────────────────────────────────────────
 const state = {
   dsKey: 'iris',
@@ -85,28 +87,94 @@ function knnPredict(trainX, trainY, point, k) {
 // ── Data Processing ───────────────────────────────────────────────────────────
 async function loadDataset(key) {
   const meta = DATASET_META[key];
-  state.dsKey      = key;
-  state.normalized = false;
-  state.accuracy   = null;
+  state.dsKey       = key;
+  state.normalized  = false;
+  state.accuracy    = null;
   state.selectedCol = 0;
-  state.xFeat      = meta.defaultX;
-  state.yFeat      = meta.defaultY;
+  state.xFeat       = meta.defaultX;
+  state.yFeat       = meta.defaultY;
   state.trainX = []; state.trainY = [];
   state.testX  = []; state.testY  = [];
-  state.lastPreds  = [];
+  state.lastPreds   = [];
 
-  const text  = await fetch(meta.file).then(r => r.text());
-  const lines = text.trim().split('\n').filter(l => l.trim());
-  const rows  = lines.slice(1).map(line => {
-    const parts    = line.split(',').map(s => s.trim());
-    const features = parts.slice(0, meta.featureCount).map(Number);
-    const classIdx = meta.classes.indexOf(parts[meta.featureCount]);
-    return [...features, classIdx];
-  }).filter(r => r[meta.featureCount] !== -1);
+  let rows;
+  if (meta._rawData) {
+    rows = meta._rawData;
+  } else {
+    const text  = await fetch(meta.file).then(r => r.text());
+    const lines = text.trim().split('\n').filter(l => l.trim());
+    rows = lines.slice(1).map(line => {
+      const parts    = line.split(',').map(s => s.trim());
+      const features = parts.slice(0, meta.featureCount).map(Number);
+      const classIdx = meta.classes.indexOf(parts[meta.featureCount]);
+      return [...features, classIdx];
+    }).filter(r => r[meta.featureCount] !== -1);
+  }
 
   state.rawData = rows;
   state.data    = rows.map(r => [...r]);
   addLog(`載入資料集：${meta.name}（${rows.length} 筆）`);
+}
+
+function handleCSVUpload(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.trim().split('\n').filter(l => l.trim());
+    if (lines.length < 2) { addLog('⚠️ CSV 格式錯誤：需要至少一列 header 與一筆資料'); return; }
+
+    const headers     = lines[0].split(',').map(s => s.trim());
+    const featureCount = headers.length - 1;
+    if (featureCount < 1) { addLog('⚠️ CSV 至少需要一個特徵欄位與一個目標欄位'); return; }
+
+    const featureCols = headers.slice(0, featureCount);
+    const targetHeader = headers[featureCount];
+
+    const rawRows = lines.slice(1).map(l => l.split(',').map(s => s.trim()));
+    const targetVals = rawRows.map(r => r[featureCount]);
+    const uniqueTargets = [...new Set(targetVals)];
+
+    const allNumeric = uniqueTargets.every(v => !isNaN(v) && v !== '');
+    let classes, toIdx;
+    if (allNumeric) {
+      const sorted = [...new Set(uniqueTargets.map(Number))].sort((a,b)=>a-b);
+      classes = sorted.map(v => `Class ${v}`);
+      toIdx   = v => sorted.indexOf(Number(v));
+    } else {
+      classes = uniqueTargets;
+      toIdx   = v => uniqueTargets.indexOf(v);
+    }
+
+    const rows = rawRows.map(parts => {
+      const features = parts.slice(0, featureCount).map(Number);
+      const classIdx = toIdx(parts[featureCount]);
+      return [...features, classIdx];
+    }).filter(r => r[featureCount] >= 0 && r.slice(0, featureCount).every(v => !isNaN(v)));
+
+    if (rows.length === 0) { addLog('⚠️ CSV 解析後無有效資料列'); return; }
+
+    const dsName = file.name.replace(/\.csv$/i, '');
+    const key    = 'upload_' + Date.now();
+    DATASET_META[key] = {
+      name: dsName,
+      file: null,
+      _rawData: rows,
+      features: featureCols,
+      target: targetHeader,
+      featureCount,
+      classes,
+      colors: classes.map((_,i) => CLASS_COLORS[i % CLASS_COLORS.length]),
+      defaultX: 0,
+      defaultY: Math.min(1, featureCount - 1),
+    };
+
+    const select = document.getElementById('dataset-select');
+    const opt = new Option(`📁 ${dsName}`, key);
+    select.add(opt);
+    select.value = key;
+
+    loadDataset(key).then(() => { updateTable(); switchTab('describe'); });
+  };
+  reader.readAsText(file);
 }
 
 function applyNormalization() {
@@ -461,6 +529,14 @@ async function init() {
     state.accuracy   = null;
     updateTable();
     switchTab('describe');
+  });
+
+  document.getElementById('upload-btn').addEventListener('click', () => {
+    document.getElementById('csv-input').click();
+  });
+  document.getElementById('csv-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) { handleCSVUpload(file); e.target.value = ''; }
   });
 
   document.querySelectorAll('.tab-btn').forEach(b=>{

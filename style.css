@@ -59,6 +59,20 @@ body {
 
 #data-count { color: var(--muted); font-size: 11px; white-space: nowrap; }
 
+#upload-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+#upload-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
 #table-wrap { flex: 1; overflow: auto; min-height: 0; }
 
 #data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
