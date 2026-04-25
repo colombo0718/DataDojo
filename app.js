@@ -1,47 +1,38 @@
-// ── Dataset ───────────────────────────────────────────────────────────────────
-const DATASETS = {
+// ── Dataset Metadata ───────────────────────────────────────────────────────────
+const DATASET_META = {
   iris: {
     name: 'Iris 鳶尾花',
-    features: ['花萼長度', '花萼寬度', '花瓣長度', '花瓣寬度'],
+    file: 'data/iris.csv',
+    features: ['花萼長度 (cm)', '花萼寬度 (cm)', '花瓣長度 (cm)', '花瓣寬度 (cm)'],
     target: '品種',
+    featureCount: 4,
     classes: ['Setosa', 'Versicolor', 'Virginica'],
     colors: ['#636EFA', '#EF553B', '#00CC96'],
-    raw: [
-      // Setosa (0)
-      [5.1,3.5,1.4,0.2,0],[4.9,3.0,1.4,0.2,0],[4.7,3.2,1.3,0.2,0],[4.6,3.1,1.5,0.2,0],[5.0,3.6,1.4,0.2,0],
-      [5.4,3.9,1.7,0.4,0],[4.6,3.4,1.4,0.3,0],[5.0,3.4,1.5,0.2,0],[4.4,2.9,1.4,0.2,0],[4.9,3.1,1.5,0.1,0],
-      [5.4,3.7,1.5,0.2,0],[4.8,3.4,1.6,0.2,0],[4.8,3.0,1.4,0.1,0],[4.3,3.0,1.1,0.1,0],[5.8,4.0,1.2,0.2,0],
-      [5.7,4.4,1.5,0.4,0],[5.4,3.9,1.3,0.4,0],[5.1,3.5,1.4,0.3,0],[5.7,3.8,1.7,0.3,0],[5.1,3.8,1.5,0.3,0],
-      [5.4,3.4,1.7,0.2,0],[5.1,3.7,1.5,0.4,0],[4.6,3.6,1.0,0.2,0],[5.1,3.3,1.7,0.5,0],[4.8,3.4,1.9,0.2,0],
-      [5.0,3.0,1.6,0.2,0],[5.0,3.4,1.6,0.4,0],[5.2,3.5,1.5,0.2,0],[5.2,3.4,1.4,0.2,0],[4.7,3.2,1.6,0.2,0],
-      [4.8,3.1,1.6,0.2,0],[5.4,3.4,1.5,0.4,0],[5.2,4.1,1.5,0.1,0],[5.5,4.2,1.4,0.2,0],[4.9,3.1,1.5,0.2,0],
-      [5.0,3.2,1.2,0.2,0],[5.5,3.5,1.3,0.2,0],[4.9,3.6,1.4,0.1,0],[4.4,3.0,1.3,0.2,0],[5.1,3.4,1.5,0.2,0],
-      [5.0,3.5,1.3,0.3,0],[4.5,2.3,1.3,0.3,0],[4.4,3.2,1.3,0.2,0],[5.0,3.5,1.6,0.6,0],[5.1,3.8,1.9,0.4,0],
-      [4.8,3.0,1.4,0.3,0],[5.1,3.8,1.6,0.2,0],[4.6,3.2,1.4,0.2,0],[5.3,3.7,1.5,0.2,0],[5.0,3.3,1.4,0.2,0],
-      // Versicolor (1)
-      [7.0,3.2,4.7,1.4,1],[6.4,3.2,4.5,1.5,1],[6.9,3.1,4.9,1.5,1],[5.5,2.3,4.0,1.3,1],[6.5,2.8,4.6,1.5,1],
-      [5.7,2.8,4.5,1.3,1],[6.3,3.3,4.7,1.6,1],[4.9,2.4,3.3,1.0,1],[6.6,2.9,4.6,1.3,1],[5.2,2.7,3.9,1.4,1],
-      [5.0,2.0,3.5,1.0,1],[5.9,3.0,4.2,1.5,1],[6.0,2.2,4.0,1.0,1],[6.1,2.9,4.7,1.4,1],[5.6,2.9,3.6,1.3,1],
-      [6.7,3.1,4.4,1.4,1],[5.6,3.0,4.5,1.5,1],[5.8,2.7,4.1,1.0,1],[6.2,2.2,4.5,1.5,1],[5.6,2.5,3.9,1.1,1],
-      [5.9,3.2,4.8,1.8,1],[6.1,2.8,4.0,1.3,1],[6.3,2.5,4.9,1.5,1],[6.1,2.8,4.7,1.2,1],[6.4,2.9,4.3,1.3,1],
-      [6.6,3.0,4.4,1.4,1],[6.8,2.8,4.8,1.4,1],[6.7,3.0,5.0,1.7,1],[6.0,2.9,4.5,1.5,1],[5.7,2.6,3.5,1.0,1],
-      [5.5,2.4,3.8,1.1,1],[5.5,2.4,3.7,1.0,1],[5.8,2.7,3.9,1.2,1],[6.0,2.7,5.1,1.6,1],[5.4,3.0,4.5,1.5,1],
-      [6.0,3.4,4.5,1.6,1],[6.7,3.1,4.7,1.5,1],[6.3,2.3,4.4,1.3,1],[5.6,3.0,4.1,1.3,1],[5.5,2.5,4.0,1.3,1],
-      [5.5,2.6,4.4,1.2,1],[6.1,3.0,4.6,1.4,1],[5.8,2.6,4.0,1.2,1],[5.0,2.3,3.3,1.0,1],[5.6,2.7,4.2,1.3,1],
-      [5.7,3.0,4.2,1.2,1],[5.7,2.9,4.2,1.3,1],[6.2,2.9,4.3,1.3,1],[5.1,2.5,3.0,1.1,1],[5.7,2.8,4.1,1.3,1],
-      // Virginica (2)
-      [6.3,3.3,6.0,2.5,2],[5.8,2.7,5.1,1.9,2],[7.1,3.0,5.9,2.1,2],[6.3,2.9,5.6,1.8,2],[6.5,3.0,5.8,2.2,2],
-      [7.6,3.0,6.6,2.1,2],[4.9,2.5,4.5,1.7,2],[7.3,2.9,6.3,1.8,2],[6.7,2.5,5.8,1.8,2],[7.2,3.6,6.1,2.5,2],
-      [6.5,3.2,5.1,2.0,2],[6.4,2.7,5.3,1.9,2],[6.8,3.0,5.5,2.1,2],[5.7,2.5,5.0,2.0,2],[5.8,2.8,5.1,2.4,2],
-      [6.4,3.2,5.3,2.3,2],[6.5,3.0,5.5,1.8,2],[7.7,3.8,6.7,2.2,2],[7.7,2.6,6.9,2.3,2],[6.0,2.2,5.0,1.5,2],
-      [6.9,3.2,5.7,2.3,2],[5.6,2.8,4.9,2.0,2],[7.7,2.8,6.7,2.0,2],[6.3,2.7,4.9,1.8,2],[6.7,3.3,5.7,2.1,2],
-      [7.2,3.2,6.0,1.8,2],[6.2,2.8,4.8,1.8,2],[6.1,3.0,4.9,1.8,2],[6.4,2.8,5.6,2.1,2],[7.2,3.0,5.8,1.6,2],
-      [7.4,2.8,6.1,1.9,2],[7.9,3.8,6.4,2.0,2],[6.4,2.8,5.6,2.2,2],[6.3,2.8,5.1,1.5,2],[6.1,2.6,5.6,1.4,2],
-      [7.7,3.0,6.1,2.3,2],[6.3,3.4,5.6,2.4,2],[6.4,3.1,5.5,1.8,2],[6.0,3.0,4.8,1.8,2],[6.9,3.1,5.4,2.1,2],
-      [6.7,3.1,5.6,2.4,2],[6.9,3.1,5.1,2.3,2],[5.8,2.7,5.1,1.9,2],[6.8,3.2,5.9,2.3,2],[6.7,3.3,5.7,2.5,2],
-      [6.7,3.0,5.2,2.3,2],[6.3,2.5,5.0,1.9,2],[6.5,3.0,5.2,2.0,2],[6.2,3.4,5.4,2.3,2],[5.9,3.0,5.1,1.8,2],
-    ]
-  }
+    defaultX: 2,
+    defaultY: 3,
+  },
+  penguins: {
+    name: 'Palmer 企鵝',
+    file: 'data/penguins.csv',
+    features: ['嘴長 (mm)', '嘴深 (mm)', '翅膀長 (mm)', '體重 (g)'],
+    target: '品種',
+    featureCount: 4,
+    classes: ['Adelie', 'Chinstrap', 'Gentoo'],
+    colors: ['#636EFA', '#EF553B', '#00CC96'],
+    defaultX: 0,
+    defaultY: 2,
+  },
+  breast_cancer: {
+    name: '乳癌診斷',
+    file: 'data/breast_cancer.csv',
+    features: ['半徑', '紋理', '周長', '面積', '光滑度', '凹度'],
+    target: '診斷',
+    featureCount: 6,
+    classes: ['Benign', 'Malignant'],
+    colors: ['#3fb950', '#f78166'],
+    defaultX: 0,
+    defaultY: 5,
+  },
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -51,7 +42,7 @@ const state = {
   data: [],
   normalized: false,
   activeTab: 'describe',
-  selectedCol: 2,
+  selectedCol: 0,
   xFeat: 2,
   yFeat: 3,
   k: 5,
@@ -65,7 +56,7 @@ const state = {
 const PIPELINE_TABS = ['describe', 'preprocess', 'train', 'results'];
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
-const ds   = () => DATASETS[state.dsKey];
+const ds   = () => DATASET_META[state.dsKey];
 const col  = i  => state.data.map(r => r[i]);
 const mean = a  => a.reduce((s,v)=>s+v,0)/a.length;
 const std  = a  => { const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length); };
@@ -92,13 +83,30 @@ function knnPredict(trainX, trainY, point, k) {
 }
 
 // ── Data Processing ───────────────────────────────────────────────────────────
-function loadDataset(key) {
-  state.dsKey    = key;
-  state.rawData  = DATASETS[key].raw.map(r=>[...r]);
-  state.data     = DATASETS[key].raw.map(r=>[...r]);
+async function loadDataset(key) {
+  const meta = DATASET_META[key];
+  state.dsKey      = key;
   state.normalized = false;
   state.accuracy   = null;
-  addLog(`載入資料集：${DATASETS[key].name}（${DATASETS[key].raw.length} 筆）`);
+  state.selectedCol = 0;
+  state.xFeat      = meta.defaultX;
+  state.yFeat      = meta.defaultY;
+  state.trainX = []; state.trainY = [];
+  state.testX  = []; state.testY  = [];
+  state.lastPreds  = [];
+
+  const text  = await fetch(meta.file).then(r => r.text());
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  const rows  = lines.slice(1).map(line => {
+    const parts    = line.split(',').map(s => s.trim());
+    const features = parts.slice(0, meta.featureCount).map(Number);
+    const classIdx = meta.classes.indexOf(parts[meta.featureCount]);
+    return [...features, classIdx];
+  }).filter(r => r[meta.featureCount] !== -1);
+
+  state.rawData = rows;
+  state.data    = rows.map(r => [...r]);
+  addLog(`載入資料集：${meta.name}（${rows.length} 筆）`);
 }
 
 function applyNormalization() {
@@ -170,10 +178,13 @@ function renderDecisionBoundary(divId) {
     zs.push(row);
   }
 
+  const colorscale = d.classes.length === 2
+    ? [[0,'rgba(63,185,80,0.25)'],[1,'rgba(247,129,102,0.25)']]
+    : [[0,'rgba(99,110,250,0.25)'],[0.5,'rgba(239,85,59,0.25)'],[1,'rgba(0,204,150,0.25)']];
+
   const heatmap = {
     type:'heatmap', x:xs, y:ys, z:zs,
-    colorscale:[[0,'rgba(99,110,250,0.25)'],[0.5,'rgba(239,85,59,0.25)'],[1,'rgba(0,204,150,0.25)']],
-    showscale:false, zmin:0, zmax:2,
+    colorscale, showscale:false, zmin:0, zmax:d.classes.length-1,
   };
 
   const trainS = d.classes.map((cls,ci)=>{
@@ -230,7 +241,7 @@ function renderIntroTab() {
         <p style="color:var(--muted);font-size:12px;margin-top:8px">同一個平台，不同的出口。介面設計自然引導你走多深，不強迫選擇。</p>
 
         <div class="intro-footer">
-          <span>🏯 DataDojo</span>
+          <span>📊 DataDojo</span>
           <span style="color:var(--border)">×</span>
           <span>LeafLune Edutainment Studio</span>
         </div>
@@ -394,7 +405,6 @@ function switchTab(tab) {
     if (b.dataset.tab === tab) b.classList.add('active');
   });
 
-  // pipeline stage 進度標記
   const stageIdx = PIPELINE_TABS.indexOf(tab);
   if (stageIdx >= 0) {
     PIPELINE_TABS.forEach((t, i) => {
@@ -440,16 +450,17 @@ function updateStats() {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-function init() {
-  loadDataset('iris');
+async function init() {
+  await loadDataset('iris');
   updateTable();
   switchTab('intro');
 
-  document.getElementById('dataset-select').addEventListener('change', e=>{
-    loadDataset(e.target.value);
-    state.normalized=false; state.accuracy=null;
+  document.getElementById('dataset-select').addEventListener('change', async e => {
+    await loadDataset(e.target.value);
+    state.normalized = false;
+    state.accuracy   = null;
     updateTable();
-    switchTab(state.activeTab);
+    switchTab('describe');
   });
 
   document.querySelectorAll('.tab-btn').forEach(b=>{
