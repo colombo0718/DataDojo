@@ -209,21 +209,8 @@ function renderIntroTab() {
         <h2>DataDojo 資料道場</h2>
         <p>LeafLune 旗下的互動式機器學習教學平台，讓你在瀏覽器中體驗完整的資料分析與機器學習流程——不需要安裝軟體，不需要寫程式碼。</p>
 
-        <div class="intro-gap-box">
-          <div class="gap-item">
-            <span class="gap-label">理論影片 / 教材</span>
-            <span class="gap-desc">生動的圖解，直觀易懂</span>
-          </div>
-          <div class="gap-arrow">
-            <span class="gap-wall">？</span>
-            <span class="gap-hint">難以跨越的斷層</span>
-          </div>
-          <div class="gap-item">
-            <span class="gap-label">Python / Weka</span>
-            <span class="gap-desc">程式碼或冰冷介面，認知負擔高</span>
-          </div>
-        </div>
-        <p style="text-align:center;color:var(--cyan);font-weight:600;margin-bottom:16px">DataDojo 填補這個斷層</p>
+        <p>學 ML 有一個幾乎所有人都遇過的困境：<strong style="color:var(--text)">聽理論很順，一進入實操就卡關。</strong>影片裡的圖解清楚生動，但真的要動手，不是要先學 Python，就是要面對像 Weka 這樣功能堆滿卻毫無引導的工具——難度一口氣跳了好幾級。</p>
+        <p>DataDojo 就是專門填補這個斷層的地方。<strong style="color:var(--cyan)">看完理論，立刻在這裡動手操作</strong>——不需要寫程式，介面友善，每一步都有即時的視覺回饋，讓你親眼看到資料的變化，而不是對著一堆數字猜發生了什麼事。</p>
 
         <h3>🎯 設計哲學</h3>
         <p>每一個功能的存在，都是為了讓你發出那聲「<strong style="color:var(--cyan)">喔～原來是這樣</strong>」。不是把功能攤在介面上，而是讓操作本身產生理解——正規化套下去，你立刻看到分布形狀不變、X 軸縮進 0～1；k 值拉一拉，你親眼看到決策邊界在變形。</p>
@@ -464,7 +451,7 @@ function updateStats() {
 function init() {
   loadDataset('iris');
   updateTable();
-  switchTab('describe');
+  switchTab('intro');
 
   document.getElementById('dataset-select').addEventListener('change', e=>{
     loadDataset(e.target.value);
