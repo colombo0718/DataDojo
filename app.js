@@ -493,16 +493,54 @@ function updateTable() {
   const tbody = document.querySelector('#data-table tbody');
 
   thead.innerHTML = `<tr>
+    <th class="row-num">#</th>
     ${d.features.map(f=>`<th>${f}</th>`).join('')}
     <th class="target-col">${d.target}</th>
   </tr>`;
 
-  tbody.innerHTML = state.data.map(row=>`<tr>
+  tbody.innerHTML = state.data.map((row,idx)=>`<tr>
+    <td class="row-num">${idx+1}</td>
     ${row.slice(0,nFeat).map(v=>`<td>${v.toFixed(state.normalized?3:1)}</td>`).join('')}
     <td class="target-col">${d.classes[row[nFeat]]}</td>
   </tr>`).join('');
+}
 
-  document.getElementById('data-count').textContent = `${state.data.length} 筆`;
+function initResizer() {
+  const resizer = document.getElementById('panel-resizer');
+  if (!resizer) return;
+  const main      = document.getElementById('main');
+  const right     = document.getElementById('rightPanel');
+  const left      = document.getElementById('leftPanel');
+  const tabBar    = document.getElementById('tab-bar');
+
+  let dragging = false, startY = 0, startRightH = 0;
+
+  resizer.addEventListener('pointerdown', e => {
+    dragging    = true;
+    startY      = e.clientY;
+    startRightH = right.getBoundingClientRect().height;
+    resizer.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  resizer.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const totalH   = main.getBoundingClientRect().height;
+    const tabBarH  = tabBar.getBoundingClientRect().height;
+    const resizerH = resizer.getBoundingClientRect().height;
+    const minRight = tabBarH + resizerH;
+    const maxRight = totalH - resizerH;
+
+    const delta   = e.clientY - startY;
+    const newRight = Math.min(maxRight, Math.max(minRight, startRightH + delta));
+    const newLeft  = totalH - newRight - resizerH;
+
+    right.style.height = `${newRight}px`;
+    left.style.height  = `${Math.max(0, newLeft)}px`;
+  });
+
+  resizer.addEventListener('pointerup',    () => { dragging = false; });
+  resizer.addEventListener('pointercancel',() => { dragging = false; });
 }
 
 function updateStats() {
@@ -542,6 +580,8 @@ async function init() {
   document.querySelectorAll('.tab-btn').forEach(b=>{
     b.addEventListener('click', ()=>switchTab(b.dataset.tab));
   });
+
+  initResizer();
 }
 
 window.addEventListener('load', init);

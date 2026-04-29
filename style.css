@@ -51,9 +51,32 @@ body {
     height: 40%;
     flex-shrink: 0;
     border-right: none;
-    border-top: 1px solid var(--border);
+    border-top: none;
     border-bottom: none;
+    order: 3;
+  }
+
+  #panel-resizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 12px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    cursor: row-resize;
+    flex-shrink: 0;
     order: 2;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .resizer-grip {
+    width: 32px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
   }
 
   #rightPanel {
@@ -127,6 +150,7 @@ body {
 
 #data-table tr:hover td { background: var(--surface); }
 .target-col { color: var(--orange); }
+.row-num    { color: var(--muted); text-align: right; user-select: none; }
 
 /* ── RIGHT PANEL ──────────────────────────────────────── */
 #rightPanel {
