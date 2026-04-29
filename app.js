@@ -528,7 +528,7 @@ function initResizer() {
     const totalH   = main.getBoundingClientRect().height;
     const tabBarH  = tabBar.getBoundingClientRect().height;
     const resizerH = resizer.getBoundingClientRect().height;
-    const minRight = tabBarH + resizerH;
+    const minRight = tabBarH;
     const maxRight = totalH - resizerH;
 
     const delta   = e.clientY - startY;
