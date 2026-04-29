@@ -51,12 +51,15 @@ body {
     height: 40%;
     flex-shrink: 0;
     border-right: none;
-    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    order: 2;
   }
 
   #rightPanel {
     height: 60%;
     min-width: 0;
+    order: 1;
   }
 
   #tab-bar {
