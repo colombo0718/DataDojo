@@ -37,6 +37,34 @@ body {
   overflow: hidden;
 }
 
+/* ── 豎屏：上下分欄 ───────────────────────────────────── */
+@media (orientation: portrait) {
+  body { overflow: hidden; }
+
+  #main {
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  #leftPanel {
+    width: 100%;
+    height: 40%;
+    flex-shrink: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #rightPanel {
+    height: 60%;
+    min-width: 0;
+  }
+
+  #tab-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+}
+
 #dataset-bar {
   display: flex;
   align-items: center;
