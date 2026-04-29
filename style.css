@@ -456,6 +456,29 @@ body {
   font-size: 12px;
 }
 
+/* ── CONFUSION MATRIX ─────────────────────────────────── */
+.cm-wrap    { padding: 16px 20px; }
+.cm-hint    { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+
+.cm-metrics { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.cm-metric  {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.cm-metric-label { color: var(--muted); font-size: 10px; }
+.cm-metric-val   { color: var(--cyan); font-size: 15px; font-weight: 700; }
+
+.cm-table { border-collapse: collapse; font-size: 12px; }
+.cm-table th, .cm-table td { border: 1px solid var(--border); padding: 8px 16px; text-align: center; }
+.cm-table th  { background: var(--surface); font-weight: 600; }
+.cm-corner    { color: var(--muted); font-size: 10px; font-weight: 400; }
+.cm-correct   { background: rgba(63,185,80,0.15); color: var(--green); font-size: 15px; font-weight: 700; }
+.cm-wrong     { background: rgba(247,129,102,0.06); color: var(--muted); font-size: 14px; }
+.cm-pct       { display: block; font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+
 /* ── LOG TAB ──────────────────────────────────────────── */
 #log-tab {
   flex: 1;
