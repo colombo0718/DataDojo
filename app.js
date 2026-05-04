@@ -45,6 +45,39 @@ const DATASET_META = {
     defaultX: 0,
     defaultY: 5,
   },
+  heart_disease: {
+    name: '心臟病診斷',
+    file: 'data/heart_disease.csv',
+    features: ['年齡', '性別(女0男1)', '胸痛類型', '靜態血壓', '膽固醇', '最高心率'],
+    target: '心臟病',
+    featureCount: 6,
+    classes: ['無', '有'],
+    classMap: { '0': 0, '1': 1 },
+    colors: ['#3fb950', '#f78166'],
+    defaultX: 0,
+    defaultY: 5,
+  },
+  pima_diabetes: {
+    name: 'Pima 糖尿病',
+    file: 'data/pima_diabetes.csv',
+    features: ['懷孕次數', '血糖值', '血壓', 'BMI', '糖尿病遺傳指數', '年齡'],
+    target: '糖尿病',
+    featureCount: 6,
+    classes: ['無', '有'],
+    classMap: { '0': 0, '1': 1 },
+    colors: ['#3fb950', '#f78166'],
+    defaultX: 1,
+    defaultY: 3,
+  },
+  mall_customers: {
+    name: '商場顧客',
+    file: 'data/mall_customers.csv',
+    features: ['年齡', '年收入(千$)', '消費分數'],
+    featureCount: 3,
+    unsupervised: true,
+    defaultX: 1,
+    defaultY: 2,
+  },
 };
 
 const CLASS_COLORS = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A','#19D3F3','#FF6692'];
@@ -63,6 +96,10 @@ const state = {
   algorithm: 'knn',
   dtDepth: 4,
   dtModel: null,
+  nTrees: 20,
+  rfModel: null,
+  kClusters: 3,
+  kmResult: null,
   predictor: null,
   trainX: [], trainY: [],
   testX:  [], testY:  [],
@@ -150,12 +187,112 @@ function dtPredict(node, pt) {
   return pt[node.f]<=node.t ? dtPredict(node.left,pt) : dtPredict(node.right,pt);
 }
 
+function buildForest(X, y, nTrees, maxDepth) {
+  const trees = [];
+  for (let t = 0; t < nTrees; t++) {
+    const idx = Array.from({length: X.length}, () => Math.floor(Math.random() * X.length));
+    trees.push(buildTree(idx.map(i=>X[i]), idx.map(i=>y[i]), 0, maxDepth));
+  }
+  return trees;
+}
+
+function rfPredict(trees, pt) {
+  const counts = {};
+  trees.forEach(t => { const p = dtPredict(t, pt); counts[p] = (counts[p]||0)+1; });
+  return +Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+}
+
+function kMeans(X, k, maxIter=100) {
+  const n = X.length, dim = X[0].length;
+  const used = new Set();
+  let centroids = [];
+  while (centroids.length < k) {
+    const i = Math.floor(Math.random() * n);
+    if (!used.has(i)) { used.add(i); centroids.push([...X[i]]); }
+  }
+  let labels = new Array(n).fill(0);
+  for (let iter = 0; iter < maxIter; iter++) {
+    const newLabels = X.map(pt => {
+      let best = 0, minD = Infinity;
+      centroids.forEach((c,ci) => {
+        const d = pt.reduce((s,v,d) => s+(v-c[d])**2, 0);
+        if (d < minD) { minD = d; best = ci; }
+      });
+      return best;
+    });
+    if (newLabels.every((l,i) => l === labels[i])) break;
+    labels = newLabels;
+    centroids = Array.from({length:k}, (_,ci) => {
+      const pts = X.filter((_,i) => labels[i] === ci);
+      if (!pts.length) return centroids[ci];
+      return Array.from({length:dim}, (_,d) => pts.reduce((s,p) => s+p[d], 0)/pts.length);
+    });
+  }
+  const inertia = X.reduce((s,pt,i) => {
+    const c = centroids[labels[i]];
+    return s + pt.reduce((ss,v,d) => ss+(v-c[d])**2, 0);
+  }, 0);
+  return { labels, centroids, inertia };
+}
+
+function computeElbow(X) {
+  return Array.from({length:8}, (_,i) => {
+    const k = i + 2;
+    return { x: k, y: +kMeans(X, k).inertia.toFixed(0) };
+  });
+}
+
+function renderClusterScatter(divId) {
+  const d = ds();
+  const { labels, centroids } = state.kmResult;
+  const k = state.kClusters;
+  const X = state.data.map(r => [r[state.xFeat], r[state.yFeat]]);
+  const traces = Array.from({length:k}, (_,ci) => {
+    const pts = X.filter((_,i) => labels[i] === ci);
+    return {
+      type:'scatter', mode:'markers', name:`群 ${ci+1}`,
+      x: pts.map(p=>p[0]), y: pts.map(p=>p[1]),
+      marker:{ color: CLASS_COLORS[ci % CLASS_COLORS.length], size:7, opacity:0.8 },
+    };
+  });
+  traces.push({
+    type:'scatter', mode:'markers', name:'中心點',
+    x: centroids.map(c=>c[0]), y: centroids.map(c=>c[1]),
+    marker:{ color:'#fff', size:14, symbol:'x', line:{color:'#000',width:2} },
+  });
+  Plotly.newPlot(divId, traces, {
+    ...BASE,
+    xaxis:{ ...BASE.xaxis, title:{ text:d.features[state.xFeat], font:{size:10} } },
+    yaxis:{ ...BASE.yaxis, title:{ text:d.features[state.yFeat], font:{size:10} } },
+    margin:{ t:16, r:8, b:48, l:52 },
+    showlegend:true, legend:{ font:{ color:'#e6edf3', size:10 } },
+  }, CFG);
+}
+
+function computeAccuracyCurve() {
+  const { trainX, trainY, testX, testY, algorithm, dtDepth } = state;
+  if (!trainX.length) return null;
+  const acc = (preds) => +(preds.filter((p,i)=>p===testY[i]).length / testY.length * 100).toFixed(1);
+  if (algorithm === 'knn') {
+    return Array.from({length:20},(_,i)=>({ x:i+1, y:acc(testX.map(p=>knnPredict(trainX,trainY,p,i+1))) }));
+  }
+  if (algorithm === 'dt') {
+    return Array.from({length:10},(_,i)=>({ x:i+1, y:acc(testX.map(p=>dtPredict(buildTree(trainX,trainY,0,i+1),p))) }));
+  }
+  if (algorithm === 'rf') {
+    return [5,10,15,20,30,40,50].map(n=>({ x:n, y:acc(testX.map(p=>rfPredict(buildForest(trainX,trainY,n,dtDepth),p))) }));
+  }
+  return null;
+}
+
 // ── Data Processing ───────────────────────────────────────────────────────────
 async function loadDataset(key) {
   const meta = DATASET_META[key];
   state.dsKey       = key;
   state.normalized  = false;
   state.accuracy    = null;
+  state.algorithm   = 'knn';
+  state.predictor   = null;
   state.selectedCol = 0;
   state.xFeat       = meta.defaultX;
   state.yFeat       = meta.defaultY;
@@ -169,15 +306,23 @@ async function loadDataset(key) {
   } else {
     const text  = await fetch(meta.file).then(r => r.text());
     const lines = text.trim().split('\n').filter(l => l.trim());
-    rows = lines.slice(1).map(line => {
-      const parts    = line.split(',').map(s => s.trim());
-      const features = parts.slice(0, meta.featureCount).map(Number);
-      const raw = parts[meta.featureCount];
-      const classIdx = meta.classMap ? (meta.classMap[raw] ?? -1) : meta.classes.indexOf(raw);
-      return [...features, classIdx];
-    }).filter(r => r[meta.featureCount] !== -1);
+    if (meta.unsupervised) {
+      rows = lines.slice(1).map(line => {
+        const parts = line.split(',').map(s => s.trim());
+        return parts.slice(0, meta.featureCount).map(Number);
+      }).filter(r => r.every(v => !isNaN(v)));
+    } else {
+      rows = lines.slice(1).map(line => {
+        const parts    = line.split(',').map(s => s.trim());
+        const features = parts.slice(0, meta.featureCount).map(Number);
+        const raw = parts[meta.featureCount];
+        const classIdx = meta.classMap ? (meta.classMap[raw] ?? -1) : meta.classes.indexOf(raw);
+        return [...features, classIdx];
+      }).filter(r => r[meta.featureCount] !== -1);
+    }
   }
 
+  state.kmResult = null;
   state.rawData = rows;
   state.data    = rows.map(r => [...r]);
   addLog(`載入資料集：${meta.name}（${rows.length} 筆）`);
@@ -258,6 +403,14 @@ function applyNormalization() {
 }
 
 function splitAndTrain() {
+  if (ds().unsupervised) {
+    const X = state.data.map(r => [r[state.xFeat], r[state.yFeat]]);
+    state.kmResult = kMeans(X, state.kClusters);
+    state.accuracy = null;
+    addLog(`k-means 分群：k=${state.kClusters}，特徵（${ds().features[state.xFeat]} × ${ds().features[state.yFeat]}），群內誤差 ${state.kmResult.inertia.toFixed(0)}`);
+    return;
+  }
+
   const nFeat    = ds().features.length;
   const shuffled = [...state.data].sort(()=>Math.random()-0.5);
   const cut      = Math.floor(shuffled.length*0.8);
@@ -271,10 +424,14 @@ function splitAndTrain() {
   if (state.algorithm === 'knn') {
     state.predictor = p => knnPredict(state.trainX, state.trainY, p, state.k);
     addLog(`k-NN 訓練：k=${state.k}，特徵（${ds().features[state.xFeat]} × ${ds().features[state.yFeat]}）`);
-  } else {
+  } else if (state.algorithm === 'dt') {
     state.dtModel   = buildTree(state.trainX, state.trainY, 0, state.dtDepth);
     state.predictor = p => dtPredict(state.dtModel, p);
     addLog(`Decision Tree 訓練：depth=${state.dtDepth}，特徵（${ds().features[state.xFeat]} × ${ds().features[state.yFeat]}）`);
+  } else {
+    state.rfModel   = buildForest(state.trainX, state.trainY, state.nTrees, state.dtDepth);
+    state.predictor = p => rfPredict(state.rfModel, p);
+    addLog(`Random Forest 訓練：${state.nTrees} 棵樹，depth=${state.dtDepth}，特徵（${ds().features[state.xFeat]} × ${ds().features[state.yFeat]}）`);
   }
 
   state.lastPreds = state.testX.map(p => state.predictor(p));
@@ -462,10 +619,52 @@ function renderTrainTab() {
   const d    = ds();
   const opts = i => d.features.map((f,fi)=>`<option value="${fi}" ${fi===i?'selected':''}>${f}</option>`).join('');
   const acc  = state.accuracy ? `<span class="accuracy-badge">準確率 ${state.accuracy}%</span>` : '';
-  const isKnn = state.algorithm === 'knn';
-  const desc = isKnn
+
+  if (d.unsupervised) {
+    const inertiaLabel = state.kmResult
+      ? `<span class="accuracy-badge">群內誤差 ${state.kmResult.inertia.toFixed(0)}</span>` : '';
+    document.getElementById('tab-content').innerHTML = `
+      <div class="stage-tab">
+        <div class="stage-controls">
+          <div class="stage-title">🔵 分群 / k-means</div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">X 軸</span>
+            <select id="x-feat">${opts(state.xFeat)}</select>
+            <span class="ctrl-label">Y 軸</span>
+            <select id="y-feat">${opts(state.yFeat)}</select>
+          </div>
+          <div class="ctrl-row">
+            <span class="ctrl-label">群數 k</span>
+            <input type="range" id="k-clusters" min="2" max="10" value="${state.kClusters}">
+            <span class="k-val" id="k-clusters-val">k = ${state.kClusters}</span>
+          </div>
+          <div class="ctrl-row">
+            <button class="btn btn-primary" id="btn-train">分群</button>
+            ${inertiaLabel}
+          </div>
+          <p class="stage-desc">k-means 不需要標準答案，自動將資料分成 k 群。到成效頁看 Elbow 曲線找最佳 k。</p>
+        </div>
+        <div class="stage-chart" id="boundary-chart"></div>
+      </div>`;
+    if (state.kmResult) renderClusterScatter('boundary-chart');
+    document.getElementById('x-feat').addEventListener('change', e=>{ state.xFeat=+e.target.value; });
+    document.getElementById('y-feat').addEventListener('change', e=>{ state.yFeat=+e.target.value; });
+    document.getElementById('k-clusters').addEventListener('input', e=>{
+      state.kClusters=+e.target.value;
+      document.getElementById('k-clusters-val').textContent=`k = ${state.kClusters}`;
+    });
+    document.getElementById('btn-train').addEventListener('click', ()=>{
+      splitAndTrain(); renderTrainTab();
+    });
+    return;
+  }
+
+  const algo = state.algorithm;
+  const desc = algo === 'knn'
     ? 'k 越小邊界越鋸齒（過擬合），k 越大越平滑（欠擬合）。'
-    : '深度越深邊界越細緻，但可能過擬合訓練資料。';
+    : algo === 'dt'
+    ? '深度越深邊界越細緻，但可能過擬合訓練資料。'
+    : '多棵決策樹各自投票，集體決策比單棵樹更穩定。';
 
   document.getElementById('tab-content').innerHTML = `
     <div class="stage-tab">
@@ -474,23 +673,29 @@ function renderTrainTab() {
         <div class="ctrl-row">
           <span class="ctrl-label">算法</span>
           <select id="algo-select">
-            <option value="knn" ${isKnn?'selected':''}>k-NN</option>
-            <option value="dt"  ${!isKnn?'selected':''}>Decision Tree</option>
+            <option value="knn" ${algo==='knn'?'selected':''}>k-NN</option>
+            <option value="dt"  ${algo==='dt' ?'selected':''}>Decision Tree</option>
+            <option value="rf"  ${algo==='rf' ?'selected':''}>Random Forest</option>
           </select>
           <span class="ctrl-label">X 軸</span>
           <select id="x-feat">${opts(state.xFeat)}</select>
           <span class="ctrl-label">Y 軸</span>
           <select id="y-feat">${opts(state.yFeat)}</select>
         </div>
-        <div class="ctrl-row" id="knn-params" style="${isKnn?'':'display:none'}">
+        <div class="ctrl-row" id="knn-params" style="${algo==='knn'?'':'display:none'}">
           <span class="ctrl-label">k 值</span>
           <input type="range" id="k-slider" min="1" max="20" value="${state.k}">
           <span class="k-val" id="k-val">k = ${state.k}</span>
         </div>
-        <div class="ctrl-row" id="dt-params" style="${!isKnn?'':'display:none'}">
+        <div class="ctrl-row" id="dt-params" style="${algo!=='knn'?'':'display:none'}">
           <span class="ctrl-label">最大深度</span>
           <input type="range" id="depth-slider" min="1" max="10" value="${state.dtDepth}">
           <span class="k-val" id="depth-val">depth = ${state.dtDepth}</span>
+        </div>
+        <div class="ctrl-row" id="rf-params" style="${algo==='rf'?'':'display:none'}">
+          <span class="ctrl-label">樹的數量</span>
+          <input type="range" id="ntrees-slider" min="5" max="50" step="5" value="${state.nTrees}">
+          <span class="k-val" id="ntrees-val">${state.nTrees} 棵</span>
         </div>
         <div class="ctrl-row">
           <button class="btn btn-primary" id="btn-train">訓練</button>
@@ -516,6 +721,10 @@ function renderTrainTab() {
   document.getElementById('depth-slider')?.addEventListener('input', e=>{
     state.dtDepth=+e.target.value;
     document.getElementById('depth-val').textContent=`depth = ${state.dtDepth}`;
+  });
+  document.getElementById('ntrees-slider')?.addEventListener('input', e=>{
+    state.nTrees=+e.target.value;
+    document.getElementById('ntrees-val').textContent=`${state.nTrees} 棵`;
   });
   document.getElementById('btn-train').addEventListener('click', ()=>{
     splitAndTrain();
@@ -558,8 +767,66 @@ function renderConfusionMatrix(divId) {
   </div>`;
 }
 
+function renderAccuracyCurve(divId, curveData, xLabel, currentX) {
+  const xs = curveData.map(p=>p.x), ys = curveData.map(p=>p.y);
+  Plotly.newPlot(divId, [{
+    type:'scatter', mode:'lines+markers', x:xs, y:ys,
+    line:{ color:'#58a6ff', width:2 },
+    marker:{ color:xs.map(x=>x===currentX?'#f78166':'#58a6ff'), size:8 },
+  }], {
+    ...BASE,
+    title:{ text:`${xLabel} vs 準確率`, font:{ size:11, color:'#8b949e' } },
+    xaxis:{ ...BASE.xaxis, title:{ text:xLabel, font:{size:10} } },
+    yaxis:{ ...BASE.yaxis, title:{ text:'準確率 (%)', font:{size:10} }, range:[0,100] },
+    margin:{ t:30, r:16, b:48, l:52 },
+  }, CFG);
+}
+
 function renderResultsTab() {
-  const algoLabel = state.algorithm === 'knn' ? `k-NN（k=${state.k}）` : `Decision Tree（depth=${state.dtDepth}）`;
+  if (ds().unsupervised) {
+    document.getElementById('tab-content').innerHTML = `
+      <div class="stage-tab">
+        <div class="stage-controls">
+          <div class="stage-title">💡 分群結果</div>
+          ${state.kmResult
+            ? `<p class="stage-desc">群數 k=${state.kClusters}，群內誤差 ${state.kmResult.inertia.toFixed(0)}。Elbow 曲線：找誤差下降開始趨緩的轉折點，那就是最佳 k。</p>`
+            : `<p class="stage-desc" style="color:var(--orange)">請先到「訓練」完成分群。</p>`}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1;min-height:0">
+          <div id="cluster-chart" style="flex:1;min-height:220px"></div>
+          ${state.kmResult ? '<div id="elbow-chart" style="height:220px"></div>' : ''}
+        </div>
+      </div>`;
+    if (state.kmResult) {
+      renderClusterScatter('cluster-chart');
+      const X = state.data.map(r => [r[state.xFeat], r[state.yFeat]]);
+      const elbow = computeElbow(X);
+      Plotly.newPlot('elbow-chart', [{
+        type:'scatter', mode:'lines+markers', x:elbow.map(p=>p.x), y:elbow.map(p=>p.y),
+        line:{color:'#58a6ff',width:2},
+        marker:{color:elbow.map(p=>p.x===state.kClusters?'#f78166':'#58a6ff'), size:8},
+      }], {
+        ...BASE,
+        title:{ text:'Elbow 曲線：群數 vs 群內誤差', font:{size:11,color:'#8b949e'} },
+        xaxis:{ ...BASE.xaxis, title:{text:'群數 k',font:{size:10}} },
+        yaxis:{ ...BASE.yaxis, title:{text:'群內誤差',font:{size:10}} },
+        margin:{ t:30, r:16, b:48, l:60 },
+      }, CFG);
+    }
+    return;
+  }
+
+  const algo = state.algorithm;
+  const algoLabel = algo==='knn' ? `k-NN（k=${state.k}）`
+    : algo==='dt' ? `Decision Tree（depth=${state.dtDepth}）`
+    : `Random Forest（${state.nTrees} 棵，depth=${state.dtDepth}）`;
+  const curveLabel = algo==='knn' ? 'k 值' : algo==='dt' ? '樹深度' : '樹的數量';
+  const curveDesc  = algo==='knn'
+    ? 'k 太小容易過擬合，k 太大容易欠擬合，紅點是目前選擇的 k。'
+    : algo==='dt'
+    ? '深度越深邊界越複雜，但過深會過擬合，紅點是目前深度。'
+    : '樹越多結果越穩定，紅點是目前棵數。';
+
   document.getElementById('tab-content').innerHTML = `
     <div class="stage-tab">
       <div class="stage-controls">
@@ -574,10 +841,22 @@ function renderResultsTab() {
         <p class="stage-desc">混淆矩陣：橫軸是模型預測，縱軸是真實答案。對角線是答對的，其他格子是搞錯的。</p>
         ` : `<p class="stage-desc" style="color:var(--orange)">請先到「訓練」完成訓練。</p>`}
       </div>
-      <div class="stage-chart" id="result-chart" style="overflow-y:auto"></div>
+      <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1;min-height:0">
+        <div id="result-chart"></div>
+        ${state.accuracy ? `
+        <div style="padding:0 8px">
+          <p class="stage-desc" style="margin:0 0 4px">${curveLabel}掃描曲線：${curveDesc}</p>
+        </div>
+        <div id="curve-chart" style="height:220px"></div>` : ''}
+      </div>
     </div>`;
 
-  if (state.accuracy) renderConfusionMatrix('result-chart');
+  if (state.accuracy) {
+    renderConfusionMatrix('result-chart');
+    const curveData = computeAccuracyCurve();
+    const currentX  = algo==='knn' ? state.k : algo==='dt' ? state.dtDepth : state.nTrees;
+    if (curveData) renderAccuracyCurve('curve-chart', curveData, curveLabel, currentX);
+  }
 }
 
 function renderLogTab() {
@@ -629,6 +908,18 @@ function updateTable() {
   const nFeat = d.features.length;
   const thead = document.querySelector('#data-table thead');
   const tbody = document.querySelector('#data-table tbody');
+
+  if (d.unsupervised) {
+    thead.innerHTML = `<tr>
+      <th class="row-num">#</th>
+      ${d.features.map(f=>`<th>${f}</th>`).join('')}
+    </tr>`;
+    tbody.innerHTML = state.data.map((row,idx)=>`<tr>
+      <td class="row-num">${idx+1}</td>
+      ${row.map(v=>`<td>${v.toFixed(state.normalized?3:1)}</td>`).join('')}
+    </tr>`).join('');
+    return;
+  }
 
   thead.innerHTML = `<tr>
     <th class="row-num">#</th>
