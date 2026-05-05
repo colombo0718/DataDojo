@@ -817,8 +817,8 @@ function renderTrainTab() {
     state.algorithm=e.target.value; state.accuracy=null; state.predictor=null;
     renderTrainTab();
   });
-  document.getElementById('x-feat').addEventListener('change', e=>{ state.xFeat=+e.target.value; });
-  document.getElementById('y-feat').addEventListener('change', e=>{ state.yFeat=+e.target.value; });
+  document.getElementById('x-feat').addEventListener('change', e=>{ state.xFeat=+e.target.value; state.accuracy=null; state.predictor=null; state.kmResult=null; renderTrainTab(); });
+  document.getElementById('y-feat').addEventListener('change', e=>{ state.yFeat=+e.target.value; state.accuracy=null; state.predictor=null; state.kmResult=null; renderTrainTab(); });
   document.getElementById('k-slider')?.addEventListener('input', e=>{
     state.k=+e.target.value;
     document.getElementById('k-val').textContent=`k = ${state.k}`;

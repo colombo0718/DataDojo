@@ -1,0 +1,104 @@
+{
+  "generatedAt": "2026-05-05T02:25:01.413Z",
+  "baseUrl": "http://127.0.0.1:4173",
+  "pass": 15,
+  "fail": 1,
+  "results": [
+    {
+      "id": "purpose.no-code-ui",
+      "title": "可從 UI 啟動，不需程式碼",
+      "status": "pass",
+      "details": "introVisible=true"
+    },
+    {
+      "id": "ui.tab-count-browser",
+      "title": "瀏覽器中六個 Tab 可見且順序正確",
+      "status": "pass",
+      "details": "intro -> describe -> preprocess -> train -> results -> log"
+    },
+    {
+      "id": "teaching.results-empty-state",
+      "title": "未訓練切到成效 tab 有提示",
+      "status": "pass",
+      "details": "\n    \n      \n        💡 結果解讀\n        請先到「訓練」完成訓練。\n      \n      \n        \n        \n      \n    "
+    },
+    {
+      "id": "teaching.why-copy",
+      "title": "前處理區有解釋性文字",
+      "status": "pass",
+      "details": "\n    \n      \n        🧹 資料前處理\n        \n          缺失值\n          不處理補平均值補中位數刪除該筆\n          （套用至全欄）\n        \n        \n          \n            特徵欄位\n            缺失值\n            數值縮放\n    "
+    },
+    {
+      "id": "ui.console-clean-intro",
+      "title": "基本導覽流程無 console / pageerror",
+      "status": "pass",
+      "details": "consoleErrors=0, pageErrors=0"
+    },
+    {
+      "id": "train.browser-knn",
+      "title": "k-NN 瀏覽器實跑成功",
+      "status": "pass",
+      "details": "accuracy=準確率 96.7%"
+    },
+    {
+      "id": "train.browser-slider",
+      "title": "k 值滑桿可操作並更新標籤",
+      "status": "pass",
+      "details": "k = 5 -> k = 9"
+    },
+    {
+      "id": "results.browser-matrix",
+      "title": "成效頁混淆矩陣可見",
+      "status": "pass",
+      "details": "\n    \n    對角線（綠色）= 預測正確；其餘 = 混淆\n    實際 ↓ 預測 →SetosaVersicolorVirginica\n    Setosa\n    1446.7%00.0%00.0%\n  \n    Versicolor\n    00.0%826.7%13.3%\n  \n    Virginica\n    00.0%00.0%723.3%"
+    },
+    {
+      "id": "train.browser-dt-rf",
+      "title": "DT / RF 瀏覽器實跑成功",
+      "status": "pass",
+      "details": "Decision Tree 與 Random Forest 皆完成點擊訓練。"
+    },
+    {
+      "id": "train.browser-xy-clear",
+      "title": "切換 X 軸後應清空舊訓練結果",
+      "status": "fail",
+      "details": "beforeCount=1, afterCount=1"
+    },
+    {
+      "id": "data.browser-csv-upload",
+      "title": "CSV 上傳可解析數字與文字標籤",
+      "status": "pass",
+      "details": "numericOk=true, textOk=true"
+    },
+    {
+      "id": "ui.console-clean-train",
+      "title": "訓練流程無 console / pageerror",
+      "status": "pass",
+      "details": "consoleErrors=0, pageErrors=0"
+    },
+    {
+      "id": "results.browser-kmeans",
+      "title": "k-means 與 Elbow 曲線瀏覽器實跑成功",
+      "status": "pass",
+      "details": "\n      \n        \n          💡 分群結果\n          群數 k=3，群內誤差 129218。Elbow 曲線：找誤差下降開始趨緩的轉折點，那就是最佳 k。\n        \n        \n          20406080100120020406080100群 1群 2群 3中"
+    },
+    {
+      "id": "ui.console-clean-kmeans",
+      "title": "k-means 流程無 console / pageerror",
+      "status": "pass",
+      "details": "consoleErrors=0, pageErrors=0"
+    },
+    {
+      "id": "ui.portrait-browser",
+      "title": "Portrait 模式分隔條可見且可拖動",
+      "status": "pass",
+      "details": "visible=true, before=337.59375, after=787"
+    },
+    {
+      "id": "ui.console-clean-portrait",
+      "title": "Portrait 流程無 console / pageerror",
+      "status": "pass",
+      "details": "consoleErrors=0, pageErrors=0"
+    }
+  ]
+}
