@@ -1,6 +1,6 @@
 # DataDojo 配套書籍構想
 
-> 狀態：章節架構確立 + ML 全景引言 + RL 後記補全（2026-05-02）
+> 狀態：章節架構確立 + ML 全景引言 + RL 後記補全（2026-05-02）；DD 功能層全部就緒（2026-05-05）
 > 出版方向：勁園科教 / 自出版電子書（待確認）
 
 ---
@@ -178,6 +178,9 @@ print(export_text(dt, feature_names=feature_names))
 
 **理論：** 混淆矩陣四格（TP/FP/TN/FN）、精確率（你說的陽性中有多少是真的）vs 召回率（真正的陽性中你找到多少）、F1 score、不均衡資料集的陷阱
 
+> **Sidebar｜ROC 曲線是什麼？**
+> 混淆矩陣可以延伸出另一種常見圖表——ROC 曲線，它把不同分類閾值下的真陽率對假陽率畫成一條曲線，AUC 值越接近 1 代表模型越強。進入 Kaggle 實戰後會常見，本書不展開，但你看到時不會陌生。
+
 **DD 操作：** 載入心臟病資料 → 訓練 → 切到成效 tab → 讀混淆矩陣（對角線 vs 非對角線）→ 對比乳癌 / 心臟病兩個資料集，感受 FN 代價
 
 **Colab 對照：**
@@ -187,7 +190,6 @@ print(classification_report(y_test, y_pred))
 # precision, recall, f1 全部出來
 ```
 
-> ⚠️ **DD 開發依賴：** 需新增 Heart Disease 資料集
 
 ---
 
@@ -213,7 +215,6 @@ train_scores, test_scores = validation_curve(
 )
 ```
 
-> ⚠️ **DD 開發依賴：** 需新增 Diabetes 資料集 + k vs 準確率折線圖功能（TODO 中期）
 
 ---
 
@@ -238,7 +239,6 @@ kmeans.fit(X)
 # 和 DD 的結果比對
 ```
 
-> ⚠️ **DD 開發依賴：** 需新增 Mall Customers 資料集 + k-means 功能（TODO 中期）
 
 ---
 
@@ -282,13 +282,12 @@ kmeans.fit(X)
 | 2 | Breast Cancer 乳癌診斷 | ✅ | 量綱差異、正規化 |
 | 3 | Palmer Penguins 南極企鵝 | ✅ | k-NN、訓練測試分割 |
 | 4 | Titanic 鐵達尼號 | ✅ | Decision Tree、可解釋性 |
-| 5 | Cleveland Heart Disease 心臟病 | ❌ 待加 | 混淆矩陣、FP vs FN 代價 |
-| 6 | Pima Indians Diabetes 糖尿病 | ❌ 待加 | 過擬合、k vs 準確率曲線 |
-| 7 | Mall Customer Segmentation 顧客分群 | ❌ 待加 | k-means、非監督學習 |
+| 5 | Cleveland Heart Disease 心臟病 | ✅ | 混淆矩陣、FP vs FN 代價 |
+| 6 | Pima Indians Diabetes 糖尿病 | ✅ | 過擬合、k vs 準確率曲線 |
+| 7 | Mall Customer Segmentation 顧客分群 | ✅ | k-means、非監督學習 |
 | 8 | — | — | Kaggle/Colab 復現前七章 |
 
-**現在可以動筆的章節：** 第一章 ~ 第四章（DD 功能已完整支援）
-**等 DD 功能補齊：** 第五章（Heart Disease 資料集）、第六章（Diabetes + k vs 準確率曲線）、第七章（Mall Customers + k-means）
+**現在可以動筆的章節：** 第一章 ~ 第七章（DD 功能層全部就緒）
 
 ---
 

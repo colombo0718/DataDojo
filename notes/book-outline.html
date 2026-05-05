@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataDojo 配套書籍構想</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --orange: #d29922;
+    --purple: #bc8cff;
+    --pink: #f78166;
+    --yellow: #e3b341;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 40px 20px 80px;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ── */
+  .book-header {
+    text-align: center;
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .book-header .badge {
+    display: inline-block;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    letter-spacing: .5px;
+  }
+  .book-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    margin-bottom: 10px;
+  }
+  .book-header h1 span { color: var(--accent); }
+  .book-header .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 520px;
+    margin: 0 auto 24px;
+  }
+  .meta-pills {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot-green { background: var(--green); }
+  .dot-orange { background: var(--orange); }
+
+  /* ── Section headers ── */
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 48px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Positioning ── */
+  .positioning {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+  }
+  .positioning p { color: var(--muted); margin-bottom: 12px; }
+  .positioning p:last-child { margin-bottom: 0; }
+  .positioning strong { color: var(--text); }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+  .flow-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+  }
+  .flow-item.intro-item { border-color: var(--purple); color: var(--purple); }
+  .flow-item.epilogue-item { border-color: var(--pink); color: var(--pink); }
+  .flow-item .ch-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 2px;
+    letter-spacing: .5px;
+  }
+  .flow-item .ch-title { font-weight: 600; }
+  .flow-item .ch-dataset {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .flow-arrow {
+    font-size: 18px;
+    color: var(--border);
+    line-height: 1.2;
+    padding: 2px 0;
+  }
+
+  /* ── Template ── */
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .template-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .template-card .step-num {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+  .template-card .step-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .template-card .step-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Chapter cards ── */
+  .chapter-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .chapter-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ch-num {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .ch-intro .ch-num { background: #3d2b6b; color: var(--purple); }
+  .ch-1 .ch-num  { background: #1a3a1a; color: var(--green); }
+  .ch-2 .ch-num  { background: #2a2215; color: var(--yellow); }
+  .ch-3 .ch-num  { background: #12284a; color: var(--accent); }
+  .ch-4 .ch-num  { background: #3a1515; color: var(--pink); }
+  .ch-5 .ch-num  { background: #2a1515; color: #ff7b72; }
+  .ch-6 .ch-num  { background: #1a2a1a; color: #56d364; }
+  .ch-7 .ch-num  { background: #1a1a3a; color: #79c0ff; }
+  .ch-8 .ch-num  { background: #2a2020; color: var(--orange); }
+  .ch-epilogue .ch-num { background: #2a1020; color: var(--pink); }
+
+  .ch-header-text { flex: 1; }
+  .ch-header-text .ch-number-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .5px;
+    margin-bottom: 2px;
+  }
+  .ch-header-text h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .ch-dataset-badge {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+  }
+
+  .chapter-card-body {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .question-box {
+    background: var(--bg3);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--text);
+    font-style: italic;
+  }
+
+  .dataset-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .dataset-box strong { color: var(--text); display: block; margin-bottom: 6px; }
+
+  .theory-ops {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .theory-ops { grid-template-columns: 1fr; } }
+  .info-block { font-size: 13px; }
+  .info-block .label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .5px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  .info-block .content { color: var(--text); line-height: 1.6; }
+
+  .sidebar-box {
+    background: #1a1625;
+    border: 1px solid #4b3a7a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .sidebar-box .sidebar-label {
+    font-size: 11px;
+    color: var(--purple);
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    color: #c9d1d9;
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+  }
+  .code-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .5px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  /* ── Overview table ── */
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    font-size: 13.5px;
+  }
+  .overview-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .overview-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .overview-table tr:last-child td { border-bottom: none; }
+  .overview-table .ch-col { color: var(--muted); font-size: 12px; width: 50px; }
+  .tick { color: var(--green); font-size: 14px; }
+  .dash { color: var(--muted); }
+
+  /* ── Paradigm table ── */
+  .paradigm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .paradigm-table th {
+    padding: 10px 14px;
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: .5px;
+    text-align: left;
+  }
+  .paradigm-table td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .paradigm-table .covered { color: var(--green); }
+  .paradigm-table .partial { color: var(--muted); }
+
+  /* ── Pending ── */
+  .pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pending-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13.5px;
+  }
+  .pending-item .check-icon { color: var(--border); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Ready banner ── */
+  .ready-banner {
+    background: #122012;
+    border: 1px solid #2d5a2d;
+    border-radius: 8px;
+    padding: 12px 18px;
+    color: var(--green);
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  .ready-banner span { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="book-header">
+    <div class="badge">LeafLune Edutainment Studio</div>
+    <h1>DataDojo <span>配套書籍</span>構想</h1>
+    <p class="subtitle">技職 / 高中學生的第一本機器學習書，搭配 DataDojo 平台，從資料到直覺，不需要寫程式。</p>
+    <div class="meta-pills">
+      <div class="pill"><span class="dot dot-green"></span>DD 功能層全部就緒</div>
+      <div class="pill"><span class="dot dot-orange"></span>出版形式待確認</div>
+      <div class="pill">最後更新 2026-05-05</div>
+    </div>
+  </div>
+
+  <!-- Positioning -->
+  <h2>定位</h2>
+  <div class="positioning">
+    <p>DataDojo 平台是「理論到實作」的橋，這本書是讓這座橋可以離線閱讀、系統性學習的配套文字版。</p>
+    <p><strong>目標讀者：</strong>技職高中 / 大一學生，有基本電腦操作能力，沒有程式基礎。</p>
+    <p><strong>學完之後能做什麼：</strong>在 DataDojo 上完整跑一個 ML 專案，並且有足夠直覺銜接到 Kaggle / Colab。</p>
+  </div>
+
+  <!-- Flow -->
+  <h2>全書結構概覽</h2>
+  <div class="flow">
+    <div class="flow-item intro-item">
+      <div class="ch-label">引言節</div>
+      <div class="ch-title">機器學習是什麼：三大典範地圖</div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第一章</div><div class="ch-title">資料長什麼樣子</div><div class="ch-dataset">Iris 鳶尾花</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第二章</div><div class="ch-title">資料清洗與前處理</div><div class="ch-dataset">Breast Cancer</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第三章</div><div class="ch-title">讓機器學會分類：k-NN</div><div class="ch-dataset">Palmer Penguins</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第四章</div><div class="ch-title">讓規則說出來：決策樹</div><div class="ch-dataset">Titanic</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第五章</div><div class="ch-title">模型表現好不好</div><div class="ch-dataset">Heart Disease</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第六章</div><div class="ch-title">學太好也是問題</div><div class="ch-dataset">Pima Diabetes</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第七章</div><div class="ch-title">不給答案也能學</div><div class="ch-dataset">Mall Customers</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item"><div class="ch-label">第八章</div><div class="ch-title">走進真實戰場</div><div class="ch-dataset">Kaggle / Colab 復現前七章</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item epilogue-item">
+      <div class="ch-label">後記</div>
+      <div class="ch-title">第三條路：強化學習與 Rein Room</div>
+    </div>
+  </div>
+
+  <!-- Template -->
+  <h2>每章固定結構</h2>
+  <div class="template-grid">
+    <div class="template-card">
+      <div class="step-num">STEP 01</div>
+      <div class="step-name">引言</div>
+      <div class="step-desc">這章要回答的一個問題</div>
+    </div>
+    <div class="template-card">
+      <div class="step-num">STEP 02</div>
+      <div class="step-name">資料集深度介紹</div>
+      <div class="step-desc">背景故事 + 收集方式 + 每個欄位的意義</div>
+    </div>
+    <div class="template-card">
+      <div class="step-num">STEP 03</div>
+      <div class="step-name">理論講解</div>
+      <div class="step-desc">概念 + 頓悟瞬間設計</div>
+    </div>
+    <div class="template-card">
+      <div class="step-num">STEP 04</div>
+      <div class="step-name">DataDojo 實作</div>
+      <div class="step-desc">步驟式操作指引（附截圖）</div>
+    </div>
+    <div class="template-card">
+      <div class="step-num">STEP 05</div>
+      <div class="step-name">Colab 對照</div>
+      <div class="step-desc">等效 Python，讓學生知道按鈕背後是什麼</div>
+    </div>
+  </div>
+
+  <!-- Chapters -->
+  <h2>八章架構</h2>
+
+  <!-- Intro -->
+  <div class="chapter-card ch-intro">
+    <div class="chapter-card-header">
+      <div class="ch-num">序</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">引言節 · 約 3 頁 · 無 DD 操作</div>
+        <h3>機器學習是什麼</h3>
+      </div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="dataset-box">
+        <strong>Mitchell 定義（T/P/E）</strong>
+        「如果一個程式在任務 T 上的表現 P 隨著經驗 E 的累積而提升，我們就說這個程式從 E 中學習了。」<br><br>
+        翻譯成人話：給它看夠多的例子（E），它做分類的能力（P）就會變好（T）。
+      </div>
+      <table class="paradigm-table">
+        <tr>
+          <th>典範</th><th>學習方式</th><th>本書涵蓋</th><th>延伸平台</th>
+        </tr>
+        <tr>
+          <td>監督學習</td><td>有標準答案，從例子學規則</td><td class="covered">✅ 第三～六章</td><td>DataDojo</td>
+        </tr>
+        <tr>
+          <td>非監督學習</td><td>沒有答案，自己找規律</td><td class="covered">✅ 第七章</td><td>DataDojo</td>
+        </tr>
+        <tr>
+          <td>強化學習</td><td>在環境中行動，從獎懲中學</td><td class="partial">後記簡介</td><td>Rein Room</td>
+        </tr>
+      </table>
+      <div class="dataset-box">
+        <strong>學習 ≠ 記憶</strong>
+        這是本書最重要的直覺，越早建立越好：模型不是把訓練資料背起來，而是從中提取出可以推廣到新資料的規律。背起來的模型在考試時會失敗——這就是「過擬合」，第六章會深入討論。
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch1 -->
+  <div class="chapter-card ch-1">
+    <div class="chapter-card-header">
+      <div class="ch-num">01</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第一章</div>
+        <h3>資料長什麼樣子</h3>
+      </div>
+      <div class="ch-dataset-badge">🌸 Iris 鳶尾花</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">機器學習的材料是資料——但「資料」到底是什麼形狀的？</div>
+      <div class="dataset-box">
+        <strong>資料集</strong>
+        1936 年英國統計學家 Ronald Fisher 在加拿大加斯帕半島採集，三種鳶尾花各 50 株。這是史上被引用最多次的機器學習資料集，幾乎每本 ML 教材都從它開始——花是大家都見過的東西，但三種花用眼睛很難分辨，機器卻能做到。<br><br>
+        欄位：花萼長度、花萼寬度、花瓣長度、花瓣寬度（cm）、品種（Setosa / Versicolor / Virginica）
+      </div>
+      <div class="theory-ops">
+        <div class="info-block">
+          <div class="label">理論</div>
+          <div class="content">表格結構（列 = 觀測值、欄 = 特徵）、特徵 vs 標籤、數值 vs 類別、描述統計（平均、標準差、分布）</div>
+        </div>
+        <div class="info-block">
+          <div class="label">DD 操作</div>
+          <div class="content">載入 Iris → 看 # 行號 + 橘色目標欄 → 切換欄位看直方圖 → 對比花萼 vs 花瓣的分布差異</div>
+        </div>
+      </div>
+      <div>
+        <div class="code-label">COLAB 對照</div>
+        <pre>import pandas as pd
+df = pd.read_csv("iris.csv")
+df.describe()           # 對應 DD 統計量列
+df["花瓣長度"].hist()   # 對應 DD 直方圖</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch2 -->
+  <div class="chapter-card ch-2">
+    <div class="chapter-card-header">
+      <div class="ch-num">02</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第二章</div>
+        <h3>資料清洗與前處理</h3>
+      </div>
+      <div class="ch-dataset-badge">🔬 Breast Cancer</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">資料收集回來就可以直接用了嗎？</div>
+      <div class="dataset-box">
+        <strong>資料集</strong>
+        1995 年由威斯康辛大學醫院的醫師 William H. Wolberg 收集，從乳房腫塊的細針穿刺切片（FNA）計算出 30 個細胞核特徵。核心問題：這個腫塊是良性（Benign）還是惡性（Malignant）？<br><br>
+        欄位有趣之處：radius（核半徑）最大值約 28，但 area（面積）最大值超過 2500——同樣描述「大小」，數值差了 100 倍。這是理解正規化必要性的最佳範例。
+      </div>
+      <div class="theory-ops">
+        <div class="info-block">
+          <div class="label">理論</div>
+          <div class="content">量綱不一致對距離計算的影響、Min-Max 正規化原理、Z-score 標準化、缺失值的三種處理策略</div>
+        </div>
+        <div class="info-block">
+          <div class="label">DD 操作</div>
+          <div class="content">載入 Breast Cancer → 描述 tab 看 radius vs area 的 x 軸差異 → 切到清理 tab → 按正規化 → 並排對比形狀不變但 x 軸統一到 0~1</div>
+        </div>
+      </div>
+      <div>
+        <div class="code-label">COLAB 對照</div>
+        <pre>from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+df_scaled = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch3 -->
+  <div class="chapter-card ch-3">
+    <div class="chapter-card-header">
+      <div class="ch-num">03</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第三章</div>
+        <h3>讓機器學會分類：k-NN</h3>
+      </div>
+      <div class="ch-dataset-badge">🐧 Palmer Penguins</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">機器怎麼「學」？它從資料中學到的「東西」長什麼樣子？</div>
+      <div class="dataset-box">
+        <strong>資料集</strong>
+        2007-2009 年由 Dr. Kristen Gorman 在南極 Palmer 研究站收集，覆蓋三個島嶼的三種企鵝。這份資料集是 Iris 的「現代替代品」——同樣三個類別，同樣四個特徵，但主角從花變成企鵝。<br><br>
+        翅膀長 vs 體重這兩個特徵幾乎可以線性分開 Gentoo，視覺上非常乾淨。
+      </div>
+      <div class="theory-ops">
+        <div class="info-block">
+          <div class="label">理論</div>
+          <div class="content">訓練 / 測試分割的必要性、k-NN 邏輯（距離 + 投票）、k 值對決策邊界的影響、過擬合的第一個直覺（k=1 死記答案）</div>
+        </div>
+        <div class="info-block">
+          <div class="label">DD 操作</div>
+          <div class="content">載入企鵝 → 選翅膀長 × 體重 → 訓練（看圓形 vs 菱形的意義）→ 拉 k 從 1 到 15，觀察邊界從破碎到平滑</div>
+        </div>
+      </div>
+      <div>
+        <div class="code-label">COLAB 對照</div>
+        <pre>from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+knn.score(X_test, y_test)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch4 -->
+  <div class="chapter-card ch-4">
+    <div class="chapter-card-header">
+      <div class="ch-num">04</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第四章</div>
+        <h3>讓規則說出來：決策樹</h3>
+      </div>
+      <div class="ch-dataset-badge">🚢 Titanic</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">k-NN 的決策過程是一個黑盒子——有沒有一種模型，可以把它學到的規則直接說出來？</div>
+      <div class="dataset-box">
+        <strong>資料集</strong>
+        1912 年 4 月 15 日，鐵達尼號沉沒，1502 人罹難。英國貿易委員會的調查紀錄留下了乘客的艙等、年齡、性別、票價等資訊。這是機器學習歷史上最有名的二元分類任務。<br><br>
+        為什麼適合決策樹：存活的關鍵因素是「女士和小孩優先上救生艇」——這本身就是一套 if-else 規則，機器從資料中學到的決策樹會和歷史事實驚人地吻合。
+      </div>
+      <div class="theory-ops">
+        <div class="info-block">
+          <div class="label">理論</div>
+          <div class="content">決策樹邏輯（Gini 不純度、遞迴分割）、深度 vs 複雜度、可解釋性的代價、DT vs k-NN 的邊界形狀差異</div>
+        </div>
+        <div class="info-block">
+          <div class="label">DD 操作</div>
+          <div class="content">載入 Titanic → 切換到 Decision Tree → 選性別 × 票價 → depth 從 2 到 8，觀察邊界從方塊到細碎 → 與 k-NN 對比</div>
+        </div>
+      </div>
+      <div>
+        <div class="code-label">COLAB 對照</div>
+        <pre>from sklearn.tree import DecisionTreeClassifier, export_text
+
+dt = DecisionTreeClassifier(max_depth=4)
+dt.fit(X_train, y_train)
+print(export_text(dt, feature_names=feature_names))
+# 印出可讀的 if-else 規則</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch5 -->
+  <div class="chapter-card ch-5">
+    <div class="chapter-card-header">
+      <div class="ch-num">05</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第五章</div>
+        <h3>模型表現好不好：評估指標</h3>
+      </div>
+      <div class="ch-dataset-badge">❤️ Heart Disease</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">準確率 96% 聽起來很好——但如果資料有 96% 是同一類，猜全對也能到 96%。準確率說謊了嗎？</div>
+      <div class="dataset-box">
+        <strong>資料集</strong>
+        1988 年由美國克里夫蘭診所基金會收集，303 名受試者，包含年齡、性別、胸痛類型、靜止心電圖等 13 個臨床指標，目標是預測是否有心臟病。<br><br>
+        教學價值：心臟病漏診（把有病的人說成沒病 = False Negative）的代價，遠大於誤診（把沒病的說成有病 = False Positive）。這讓「精確率 vs 召回率的取捨」有了真實的道德重量。
+      </div>
+      <div class="theory-ops">
+        <div class="info-block">
+          <div class="label">理論</div>
+          <div class="content">混淆矩陣四格（TP/FP/TN/FN）、精確率 vs 召回率、F1 score、不均衡資料集的陷阱</div>
+        </div>
+        <div class="info-block">
+          <div class="label">DD 操作</div>
+          <div class="content">載入心臟病資料 → 訓練 → 切到成效 tab → 讀混淆矩陣（對角線 vs 非對角線）→ 對比乳癌 / 心臟病，感受 FN 代價</div>
+        </div>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-label">SIDEBAR｜ROC 曲線是什麼？</div>
+        混淆矩陣可以延伸出另一種常見圖表——ROC 曲線，它把不同分類閾值下的真陽率對假陽率畫成一條曲線，AUC 值越接近 1 代表模型越強。進入 Kaggle 實戰後會常見，本書不展開，但你看到時不會陌生。
+      </div>
+      <div>
+        <div class="code-label">COLAB 對照</div>
+        <pre>from sklearn.metrics import confusion_matrix, classification_report
+print(classification_report(y_test, y_pred))
+# precision, recall, f1 全部出來</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch6 -->
+  <div class="chapter-card ch-6">
+    <div class="chapter-card-header">
+      <div class="ch-num">06</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第六章</div>
+        <h3>學太好也是問題：過擬合與欠擬合</h3>
+      </div>
+      <div class="ch-dataset-badge">🩺 Pima Diabetes</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">模型在練習題（訓練集）上 100 分，在考試（測試集）卻只有 70 分——哪裡出問題了？</div>
+      <div class="dataset-box">
+        <strong>資料集</strong>
+        1988 年美國國家糖尿病與消化腎臟病研究所收集，對象是美國亞利桑那州皮馬原住民婦女，768 人，8 個特徵（懷孕次數、血糖、血壓、BMI 等）。<br><br>
+        皮馬族是世界上二型糖尿病發病率最高的族群之一。8 個特徵中有幾個高度相關，是展示特徵選擇效果的好例子。
+      </div>
+      <div class="theory-ops">
+        <div class="info-block">
+          <div class="label">理論</div>
+          <div class="content">偏差 vs 變異（bias-variance tradeoff）、訓練準確率 vs 測試準確率、k vs 準確率折線圖的形狀解讀、「甜蜜點」在中間</div>
+        </div>
+        <div class="info-block">
+          <div class="label">DD 操作</div>
+          <div class="content">載入糖尿病資料 → 掃描 k=1~20 → 看折線圖（訓練 vs 測試雙線）→ 找交叉點，感受甜蜜點</div>
+        </div>
+      </div>
+      <div>
+        <div class="code-label">COLAB 對照</div>
+        <pre>from sklearn.model_selection import validation_curve
+train_scores, test_scores = validation_curve(
+    KNeighborsClassifier(), X, y,
+    param_name="n_neighbors", param_range=range(1, 21)
+)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch7 -->
+  <div class="chapter-card ch-7">
+    <div class="chapter-card-header">
+      <div class="ch-num">07</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第七章</div>
+        <h3>不給答案也能學：非監督分群</h3>
+      </div>
+      <div class="ch-dataset-badge">🛍️ Mall Customers</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">前六章的資料都有「正確答案」——如果根本沒有人標記答案，機器還能學到什麼嗎？</div>
+      <div class="dataset-box">
+        <strong>資料集</strong>
+        一家購物中心收集的顧客資料：年齡、年收入、消費評分（1~100 分）。沒有「正確分類」，沒有人告訴你顧客應該分成幾群——但這正是重點。<br><br>
+        任何人都能直覺地說「高收入高消費」是一群、「高收入低消費」是另一群——機器自己找出來的結果和直覺驚人地接近，讓學生親眼看到「資料本身的形狀說話」。
+      </div>
+      <div class="theory-ops">
+        <div class="info-block">
+          <div class="label">理論</div>
+          <div class="content">監督 vs 非監督的根本差異、k-means 迭代邏輯（隨機中心 → 分配 → 更新 → 收斂）、k 值選擇（Elbow method 直覺）</div>
+        </div>
+        <div class="info-block">
+          <div class="label">DD 操作</div>
+          <div class="content">載入 Mall Customers → 選年收入 × 消費評分 → k 從 2 調到 7 → 找到 k=5 時最自然的分群 → 查看 Elbow 曲線</div>
+        </div>
+      </div>
+      <div>
+        <div class="code-label">COLAB 對照</div>
+        <pre>from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=5, random_state=42)
+kmeans.fit(X)
+# 和 DD 的結果比對</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch8 -->
+  <div class="chapter-card ch-8">
+    <div class="chapter-card-header">
+      <div class="ch-num">08</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">第八章</div>
+        <h3>走進真實戰場：Kaggle 與 Colab</h3>
+      </div>
+      <div class="ch-dataset-badge">復現前七章</div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="question-box">前七章你用 DataDojo 做的每個實驗——在資料科學家的日常工具裡，長什麼樣子？</div>
+      <div class="dataset-box">
+        <strong>本章無新資料集，結構如下</strong>
+        1. Colab 環境介紹（不需安裝，開 notebook 就能跑）<br>
+        2. Kaggle 平台介紹（找到 Titanic、Iris 等入門 competition）<br>
+        3. 依序復現 Ch1~7：每個實驗一個 cell block，和 DD 截圖並排<br>
+        4. 讓學生體驗：「我在 DD 按的每個按鈕，背後就是這幾行 Python」
+      </div>
+    </div>
+  </div>
+
+  <!-- Epilogue -->
+  <div class="chapter-card ch-epilogue">
+    <div class="chapter-card-header">
+      <div class="ch-num">後記</div>
+      <div class="ch-header-text">
+        <div class="ch-number-label">後記 · 約 2 頁</div>
+        <h3>第三條路：強化學習與 Rein Room</h3>
+      </div>
+    </div>
+    <div class="chapter-card-body">
+      <div class="dataset-box">
+        前八章走完了監督學習與非監督學習——機器學習三大典範，你已經走完兩條。<br><br>
+        第三條路叫做<strong>強化學習</strong>。它不看「資料集」，它看的是「環境」。Agent 在環境中採取行動，環境給出獎勵或懲罰，Agent 從中慢慢學會什麼行動在什麼情況下是好的。這種學習方式讓 AI 學會了下圍棋（AlphaGo）、玩 Atari 電動（DQN）、控制機器手臂。<br><br>
+        <strong>Rein Room</strong> 是為強化學習設計的互動平台，和 DataDojo 同屬 LeafLune 教育工具體系。你在 DataDojo 建立的直覺——算法怎麼學、怎麼評估、怎麼調參數——在 Rein Room 裡都用得上，只是舞台從靜態資料表換成了動態遊戲環境。
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview table -->
+  <h2>資料集分配總覽</h2>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;">
+    <table class="overview-table">
+      <tr>
+        <th class="ch-col">章</th>
+        <th>資料集</th>
+        <th>已在 DD</th>
+        <th>核心教學點</th>
+      </tr>
+      <tr><td class="ch-col">1</td><td>🌸 Iris 鳶尾花</td><td><span class="tick">✓</span></td><td>表格結構、描述統計</td></tr>
+      <tr><td class="ch-col">2</td><td>🔬 Breast Cancer 乳癌診斷</td><td><span class="tick">✓</span></td><td>量綱差異、正規化</td></tr>
+      <tr><td class="ch-col">3</td><td>🐧 Palmer Penguins 南極企鵝</td><td><span class="tick">✓</span></td><td>k-NN、訓練測試分割</td></tr>
+      <tr><td class="ch-col">4</td><td>🚢 Titanic 鐵達尼號</td><td><span class="tick">✓</span></td><td>Decision Tree、可解釋性</td></tr>
+      <tr><td class="ch-col">5</td><td>❤️ Cleveland Heart Disease 心臟病</td><td><span class="tick">✓</span></td><td>混淆矩陣、FP vs FN 代價</td></tr>
+      <tr><td class="ch-col">6</td><td>🩺 Pima Indians Diabetes 糖尿病</td><td><span class="tick">✓</span></td><td>過擬合、k vs 準確率曲線</td></tr>
+      <tr><td class="ch-col">7</td><td>🛍️ Mall Customer Segmentation</td><td><span class="tick">✓</span></td><td>k-means、非監督學習</td></tr>
+      <tr><td class="ch-col">8</td><td><span class="dash">—</span></td><td><span class="dash">—</span></td><td>Kaggle/Colab 復現前七章</td></tr>
+    </table>
+  </div>
+  <div class="ready-banner">
+    所有章節的 DD 功能均已就緒。<span>第一章 ～ 第七章現在可以動筆。</span>
+  </div>
+
+  <!-- Pending -->
+  <h2>待確認</h2>
+  <div class="pending-list">
+    <div class="pending-item">
+      <span class="check-icon">☐</span>
+      <span>出版形式：實體書（勁園）/ 電子書 / PDF 講義</span>
+    </div>
+    <div class="pending-item">
+      <span class="check-icon">☐</span>
+      <span>每章習題形式：操作題（在 DD 上做）+ 思考題</span>
+    </div>
+    <div class="pending-item">
+      <span class="check-icon">☐</span>
+      <span>是否搭配錄製示範影片（YouTube，每章一支）</span>
+    </div>
+    <div class="pending-item">
+      <span class="check-icon">☐</span>
+      <span>書名方向：《看見機器學習》？《資料道場》？《不用寫程式的機器學習》？</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
