@@ -289,10 +289,12 @@ function computeAccuracyCurve() {
 async function loadDataset(key) {
   const meta = DATASET_META[key];
   state.dsKey       = key;
-  state.normalized  = false;
-  state.accuracy    = null;
-  state.algorithm   = 'knn';
-  state.predictor   = null;
+  state.normalized     = false;
+  state.accuracy       = null;
+  state.algorithm      = 'knn';
+  state.predictor      = null;
+  state.colScale       = [];
+  state.missingPolicy  = 'none';
   state.selectedCol = 0;
   state.xFeat       = meta.defaultX;
   state.yFeat       = meta.defaultY;
@@ -322,7 +324,9 @@ async function loadDataset(key) {
     }
   }
 
-  state.kmResult = null;
+  state.kmResult      = null;
+  state.colScale      = meta.features.map(() => 'none');
+  state.missingPolicy = 'none';
   state.rawData = rows;
   state.data    = rows.map(r => [...r]);
   addLog(`載入資料集：${meta.name}（${rows.length} 筆）`);
@@ -389,17 +393,67 @@ function handleCSVUpload(file) {
   reader.readAsText(file);
 }
 
-function applyNormalization() {
-  const nFeat = ds().features.length;
-  const mins  = ds().features.map((_,i)=>Math.min(...state.rawData.map(r=>r[i])));
-  const maxs  = ds().features.map((_,i)=>Math.max(...state.rawData.map(r=>r[i])));
-  state.data = state.rawData.map(row => {
-    const r = [...row];
-    for (let i=0;i<nFeat;i++) r[i]=(row[i]-mins[i])/(maxs[i]-mins[i]);
-    return r;
-  });
+function countMissing(colIdx) {
+  return state.rawData.filter(r => isNaN(r[colIdx]) || r[colIdx] == null).length;
+}
+
+function applyPreprocessing() {
+  const d = ds();
+  const nFeat = d.featureCount;
+  let data = state.rawData.map(r => [...r]);
+
+  // Step 1: missing value imputation
+  if (state.missingPolicy !== 'none') {
+    if (state.missingPolicy === 'drop') {
+      data = data.filter(r => r.slice(0, nFeat).every(v => !isNaN(v) && v != null));
+    } else {
+      for (let ci = 0; ci < nFeat; ci++) {
+        const vals = data.map(r => r[ci]).filter(v => !isNaN(v) && v != null);
+        if (!vals.length) continue;
+        let fill;
+        if (state.missingPolicy === 'mean') {
+          fill = vals.reduce((s,v)=>s+v,0) / vals.length;
+        } else {
+          const sorted = [...vals].sort((a,b)=>a-b);
+          fill = sorted[Math.floor(sorted.length/2)];
+        }
+        data.forEach(r => { if (isNaN(r[ci]) || r[ci] == null) r[ci] = fill; });
+      }
+    }
+  }
+
+  // Step 2: per-column scaling
+  const scaledCols = [];
+  for (let ci = 0; ci < nFeat; ci++) {
+    const scale = state.colScale[ci];
+    if (scale === 'none') continue;
+    const vals = data.map(r => r[ci]);
+    if (scale === 'minmax') {
+      const mn = Math.min(...vals), mx = Math.max(...vals);
+      if (mx > mn) { data.forEach(r => r[ci] = (r[ci]-mn)/(mx-mn)); scaledCols.push(d.features[ci]+'（Min-Max）'); }
+    } else if (scale === 'zscore') {
+      const m = vals.reduce((s,v)=>s+v,0)/vals.length;
+      const s = Math.sqrt(vals.reduce((ss,v)=>ss+(v-m)**2,0)/vals.length);
+      if (s > 0) { data.forEach(r => r[ci] = (r[ci]-m)/s); scaledCols.push(d.features[ci]+'（Z-score）'); }
+    }
+  }
+
+  state.data       = data;
   state.normalized = true;
-  addLog(`套用正規化（Min-Max）：${ds().features.join('、')} → 縮放至 0～1`);
+  state.accuracy   = null;
+  state.predictor  = null;
+  if (state.missingPolicy !== 'none') addLog(`缺失值處理（${state.missingPolicy}）：剩 ${data.length} 筆`);
+  if (scaledCols.length) addLog(`縮放：${scaledCols.join('、')}`);
+}
+
+function resetPreprocessing() {
+  state.data          = state.rawData.map(r => [...r]);
+  state.normalized    = false;
+  state.accuracy      = null;
+  state.predictor     = null;
+  state.colScale      = ds().features.map(() => 'none');
+  state.missingPolicy = 'none';
+  addLog('重置前處理：還原原始資料');
 }
 
 function splitAndTrain() {
@@ -580,39 +634,90 @@ function renderDescribeTab() {
 }
 
 function renderPreprocessTab() {
+  const d = ds();
   const applied = state.normalized;
+  const missingOpts = ['none','mean','median','drop']
+    .map(v => `<option value="${v}" ${state.missingPolicy===v?'selected':''}>${
+      {none:'不處理', mean:'補平均值', median:'補中位數', drop:'刪除該筆'}[v]
+    }</option>`).join('');
+  const scaleOpts = ci => ['none','minmax','zscore']
+    .map(v => `<option value="${v}" ${state.colScale[ci]===v?'selected':''}>${
+      {none:'不縮放', minmax:'Min-Max（0~1）', zscore:'Z-score 標準化'}[v]
+    }</option>`).join('');
+  const featRows = d.features.map((f, ci) => {
+    const missing = countMissing(ci);
+    return `<tr>
+      <td style="padding:4px 8px;color:var(--text)">${f}</td>
+      <td style="padding:4px 8px;color:${missing>0?'var(--orange)':'var(--muted)'}">
+        ${missing > 0 ? `⚠️ ${missing} 筆` : '無'}
+      </td>
+      <td style="padding:4px 8px">
+        <select class="col-scale-select" data-ci="${ci}" style="font-size:12px">${scaleOpts(ci)}</select>
+      </td>
+    </tr>`;
+  }).join('');
+  const colOpts = d.features.map((f,i)=>`<option value="${i}" ${i===state.selectedCol?'selected':''}>${f}</option>`).join('');
+
   document.getElementById('tab-content').innerHTML = `
     <div class="stage-tab">
       <div class="stage-controls">
         <div class="stage-title">🧹 資料前處理</div>
-        <div class="ctrl-row">
-          <button class="btn btn-primary" id="btn-norm" ${applied?'disabled':''}>套用正規化（Min-Max）</button>
-          ${applied?'<span class="norm-badge">✓ 已套用，數值縮放至 0～1</span>':''}
+        <div class="ctrl-row" style="align-items:center;gap:8px">
+          <span class="ctrl-label">缺失值</span>
+          <select id="missing-policy" style="font-size:12px">${missingOpts}</select>
+          <span style="color:var(--muted);font-size:11px">（套用至全欄）</span>
         </div>
-        <p class="stage-desc">正規化將每個特徵縮放到 0～1，讓不同單位的特徵可以公平比較。套用後觀察右側前後對比——形狀不變，但 X 軸範圍縮進了。</p>
+        <table style="width:100%;border-collapse:collapse;margin:6px 0">
+          <thead><tr>
+            <th style="text-align:left;padding:4px 8px;color:var(--muted);font-size:11px;font-weight:normal">特徵欄位</th>
+            <th style="text-align:left;padding:4px 8px;color:var(--muted);font-size:11px;font-weight:normal">缺失值</th>
+            <th style="text-align:left;padding:4px 8px;color:var(--muted);font-size:11px;font-weight:normal">數值縮放</th>
+          </tr></thead>
+          <tbody>${featRows}</tbody>
+        </table>
+        <div class="ctrl-row" style="gap:8px">
+          <button class="btn btn-primary" id="btn-preprocess">套用</button>
+          ${applied ? '<button class="btn" id="btn-reset" style="background:#30363d">重置</button>' : ''}
+          ${applied ? '<span class="norm-badge">✓ 已套用前處理</span>' : ''}
+        </div>
+        <div class="ctrl-row" style="margin-top:8px">
+          <span class="ctrl-label">預覽欄位</span>
+          <select id="col-preview">${colOpts}</select>
+        </div>
+        <p class="stage-desc">Min-Max 縮放至 0~1；Z-score 縮放至均值0標準差1。右側直方圖顯示前後對比。</p>
       </div>
       <div class="stage-chart" id="norm-chart"></div>
     </div>`;
 
-  if (applied) renderBeforeAfter();
+  renderBeforeAfter();
 
-  document.getElementById('btn-norm')?.addEventListener('click', ()=>{
-    applyNormalization();
-    updateTable();
-    renderPreprocessTab();
+  document.querySelectorAll('.col-scale-select').forEach(sel => {
+    sel.addEventListener('change', e => { state.colScale[+e.target.dataset.ci] = e.target.value; });
+  });
+  document.getElementById('missing-policy').addEventListener('change', e => {
+    state.missingPolicy = e.target.value;
+  });
+  document.getElementById('col-preview').addEventListener('change', e => {
+    state.selectedCol = +e.target.value; renderBeforeAfter();
+  });
+  document.getElementById('btn-preprocess').addEventListener('click', () => {
+    applyPreprocessing(); updateTable(); renderPreprocessTab();
+  });
+  document.getElementById('btn-reset')?.addEventListener('click', () => {
+    resetPreprocessing(); updateTable(); renderPreprocessTab();
   });
 }
 
 function renderBeforeAfter() {
-  document.getElementById('norm-chart').innerHTML = `
-    <div class="before-after">
-      <div><div class="chart-label">正規化前</div><div id="hist-before" class="chart-sub"></div></div>
-      <div><div class="chart-label after">正規化後</div><div id="hist-after" class="chart-sub"></div></div>
-    </div>`;
   const ci   = state.selectedCol;
   const name = ds().features[ci];
-  renderHist('hist-before', state.rawData.map(r=>r[ci]), '#00d4ff', name);
-  renderHist('hist-after',  state.data.map(r=>r[ci]),    '#3fb950', name+'（正規化後）');
+  document.getElementById('norm-chart').innerHTML = `
+    <div class="before-after">
+      <div><div class="chart-label">處理前</div><div id="hist-before" class="chart-sub"></div></div>
+      <div><div class="chart-label after">處理後</div><div id="hist-after" class="chart-sub"></div></div>
+    </div>`;
+  renderHist('hist-before', state.rawData.map(r=>r[ci]).filter(v=>!isNaN(v)), '#00d4ff', name);
+  renderHist('hist-after',  state.data.map(r=>r[ci]).filter(v=>!isNaN(v)),    '#3fb950', name+'（處理後）');
 }
 
 function renderTrainTab() {
